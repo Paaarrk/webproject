@@ -13,8 +13,8 @@ public class userDAO {
     public userDAO() {
         try {
             String dbURL = "jdbc:mysql://localhost:3306/webproject?useSSL=false&useUnicode=true&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&serverTimezone=UTC";
-            String dbID = "root";
-            String dbPassword = "dlsdyd11!!";
+            String dbID = "xx"
+            String dbPassword = "xx"
             Class.forName("com.mysql.cj.jdbc.Driver");
             conn = DriverManager.getConnection(dbURL, dbID, dbPassword);
 
