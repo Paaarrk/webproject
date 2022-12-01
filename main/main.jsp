@@ -13,15 +13,14 @@
     <script src="${pageContext.request.contextPath}/asset/js/bootstrap.js"></script>
 </head>
 <%
-    String name = (String)request.getAttribute("userNAME");
+    String id = (String)request.getAttribute("userID");
 %>
 <body>
     <div>
         <table id="login">
             <thead>
                 <th colspan="3">
-                    <%= name%>님 회원가입에 성공하셨습니다! 
-                    <br>회원가입을 축하합니다!!
+                    <%= id%>이 로그인에 성공하셨습니다!
                 </th>
             </thead>
             <tbody>

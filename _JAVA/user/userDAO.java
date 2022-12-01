@@ -13,8 +13,8 @@ public class userDAO {
     public userDAO() {
         try {
             String dbURL = "jdbc:mysql://localhost:3306/webproject?useSSL=false&useUnicode=true&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&serverTimezone=UTC";
-            String dbID = "xx"
-            String dbPassword = "xx"
+            String dbID
+            String dbPassword
             Class.forName("com.mysql.cj.jdbc.Driver");
             conn = DriverManager.getConnection(dbURL, dbID, dbPassword);
 
@@ -128,5 +128,44 @@ public class userDAO {
             e.printStackTrace();
         }
         return -1; //데이터베이스 오류
+    }
+
+    //로그인
+    public int login(String userId, String userPw)
+    {
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        String SQL = "SELECT ID FROM webproject.memberinfo WHERE ((ID = ?)&&(PW = ?))";
+
+        try {
+            pstmt = conn.prepareStatement(SQL);
+            pstmt.setString(1, userId);
+            pstmt.setString(2,userPw);
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                //로그인
+                System.out.println("로그인 성공");
+                return 1;
+            }
+            else {
+                //로그인 실패
+                System.out.println("로그인 실패");
+                return 0;
+            }
+        } catch (Exception e) {
+            System.out.println("로그인 도중 오류 발생");
+            e.printStackTrace();
+        } finally {
+            try {
+                if(rs != null) rs.close();
+                if(pstmt != null) pstmt.close();
+            } catch (Exception e) {
+                System.out.println("로그인 처리중 오류 발생");
+                e.printStackTrace();
+            }
+        }
+
+        System.out.println("데이터베이스 오류");
+        return -1;
     }
 }

@@ -14,8 +14,6 @@
 
     <script type="text/javascript" src="../asset/js/regForm.js">
 
-
-
     </script>
 </head>
 <body>
@@ -24,14 +22,14 @@
             <table class="table table-bordered table-hover" style="text-align: center; border: 1px solid #dddddd">
                 <thead>
                     <tr>
-                        <th colspan="4"><h4>회원가입</h4></th>
+                        <th colspan="5"><h4>회원가입</h4></th>
                     </tr>
                 </thead>
                 <tbody>
                     
                     <tr>
                         <td style="width: 130px;"><h5>아이디</h5></td>
-                        <td colspan="2">
+                        <td colspan="3">
                             <ul>
                                 <input class="form-control" id="userID" type="text" name="userID" maxlength="20" placeholder="20자 내로 입력해주세요!" onkeydown="notIDClick()">
                             </ul>
@@ -48,19 +46,19 @@
                     
                     <tr>
                         <td style="width: 130px;"><h5>비밀번호</h5></td>
-                        <td colspan="2"><input class="form-control" type="password" name="userPW" maxlength="20" placeholder="20자 내로 입력해주세요!"></td>
+                        <td colspan="3"><input class="form-control" type="password" name="userPW" maxlength="20" placeholder="20자 내로 입력해주세요!"></td>
                     </tr>
 
                    
                     <tr> 
                         <td style="width: 130px;"><h5>비밀번호 확인</h5></td>
-                        <td colspan="2"><input class="form-control" type="text" name="userPWCHK" maxlength="20" placeholder="위 비밀번호와 동일하게 입력해주세요!"></td>
+                        <td colspan="3"><input class="form-control" type="password" name="userPWCHK" maxlength="20" placeholder="위 비밀번호와 동일하게 입력해주세요!"></td>
                     </tr>
 
                     
                     <tr> 
                         <td style="width: 130px;"><h5>이메일</h5></td>
-                        <td colspan="2">
+                        <td colspan="3">
                             <ul>
                                 <input class="form-control" id="userEMAIL" type="e-mail" name="userEMAIL" maxlength="45" onkeydown="notEMAILClick()" placeholder="aa@aa.com">
                             </ul>
@@ -76,7 +74,7 @@
 
                     <tr> 
                         <td style="width: 130px;"><h5>닉네임</h5></td>
-                        <td colspan="2">
+                        <td colspan="3">
                             <ul>
                                 <input class="form-control" id="userNICK" type="text" name="userNICKNAME" maxlength="45" onkeydown="notNICKNAMEClick()">
                             </ul>
@@ -92,17 +90,17 @@
                    
                     <tr> 
                         <td style="width: 130px;"><h5>이름</h5></td>
-                        <td colspan="2"><input class="form-control" type="text" name="userNAME" maxlength="45"></td>
+                        <td colspan="4"><input class="form-control" type="text" name="userNAME" maxlength="45"></td>
                     </tr>
 
                     <tr> 
                         <td style="width: 130px;"><h5>전화번호</h5></td>
-                        <td colspan="2"><input class="form-control" type="tel" name="userPHONE" maxlength="20" placeholder=" '-' 제외해주세요!"></td>
+                        <td colspan="4"><input class="form-control" type="tel" name="userPHONE" maxlength="20" placeholder=" '-' 제외해주세요!"></td>
                     </tr>
 
                     <tr> 
                         <td style="width: 130px;"><h5>성별</h5></td>
-                        <td colspan="2">
+                        <td colspan="4">
                             <div class="form-group" style="text-align: center; margin: 0 auto;">
                                 <div class="btn-group" role="group" data-toggle="buttons">   
                                     <label class="btn btn-primary active">
@@ -118,8 +116,8 @@
                     </tr>
 
                     <tr> 
-                        <td style="text-align: left" colspan="4">
-                            <input class="btn btn-primary pull-right" type="button" value="취소">
+                        <td style="text-align: right" colspan="5">
+                            <input class="btn btn-primary pull-right" type="button" value="취소" onclick="self.close()">
                             <input class="btn btn-primary pull-right" type="submit" value="회원가입"> 
                         </td>
                     </tr>

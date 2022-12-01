@@ -59,11 +59,12 @@ function checkValue()
     }
 }
 
+
 // 아이디 재입력 방지
 function notIDClick()
 {
     document.userINFO.userID_DUPLICATION.value = "IDUncheck";
-    document.getElementById("idmsg").innerHTML ="아이디 중복확인 부탁드립니다";
+    document.getElementById("idmsg").innerHTML ="<div style='color: red;'>아이디 중복확인 부탁드립니다</div>";
 }
 
 // 아이디중복검사
@@ -76,10 +77,10 @@ function regIDCheck()
     var pat_spc = /[~!@#$%^&*()_+:{}=,./';"|*\\\-\ ]/;
     var pat_kor = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/;
     if (!userID) {
-        document.getElementById("idmsg").innerHTML ="아이디를 입력해주세요";
+        document.getElementById("idmsg").innerHTML ="<div style='color: red;'>아이디를 입력해주세요</div>";
         return false;
     } else if (((pat_spc.test(userID)) || (pat_kor.test(userID))) == true) {
-        document.getElementById("idmsg").innerHTML ="한글 및 특수문자는 사용할 수 없습니다";
+        document.getElementById("idmsg").innerHTML ="<div style='color: red;'>한글 및 특수문자는 사용할 수 없습니다</div>";
         return false;
     } else {
         $.ajax({
@@ -89,10 +90,10 @@ function regIDCheck()
             success : function(result){
                 if(result == '1'){
                     document.userINFO.userID_DUPLICATION.value = "IDCheck";
-                    document.getElementById("idmsg").innerHTML ="사용 가능한 아이디입니다";
+                    document.getElementById("idmsg").innerHTML ="<div style='color: green;'>사용 가능한 아이디입니다</div>";
                 } else{
                     document.userINFO.userID_DUPLICATION.value = "IDUCheck";
-                    document.getElementById("idmsg").innerHTML ="이미 존재하는 아이디입니다";
+                    document.getElementById("idmsg").innerHTML ="<div style='color: red;'>이미 존재하는 아이디입니다</div>";
                 } 
             },
             error : function(){
@@ -106,7 +107,7 @@ function regIDCheck()
 function notNICKNAMEClick()
 {
     document.userINFO.userNICKNAME_DUPLICATION.value = "NICKNAMEUncheck";
-    document.getElementById("nickmsg").innerHTML = "닉네임 중복확인 부탁드립니다";
+    document.getElementById("nickmsg").innerHTML = "<div style='color: red;'>닉네임 중복확인 부탁드립니다</div>";
 }
 // 닉네임 중복검사
 function regNICKNAMECheck()
@@ -115,10 +116,10 @@ function regNICKNAMECheck()
     var pat_spc = /[\ ]/;
 
     if(!nic) {
-        document.getElementById("nickmsg").innerHTML = "사용하실 닉네임을 입력해주세요";   
+        document.getElementById("nickmsg").innerHTML = "<div style='color: red;'>사용하실 닉네임을 입력해주세요</div>";   
         return false;        
     } else if((pat_spc.test(nic))==true) {
-        document.getElementById("nickmsg").innerHTML = "닉네임에 공백문자를 사용할 수 없습니다";
+        document.getElementById("nickmsg").innerHTML = "<div style='color: red;'>공백문자를 사용할 수 없습니다</div>";
         return false;       
     } else {
 
@@ -131,10 +132,10 @@ function regNICKNAMECheck()
                 success : function(result){
                     if(result == 1){
                         document.userINFO.userNICKNAME_DUPLICATION.value = "NICKNAMECheck";
-                        document.getElementById("nickmsg").innerHTML ="사용 가능한 닉네임입니다";
+                        document.getElementById("nickmsg").innerHTML ="<div style='color: green;'>사용 가능한 닉네임입니다</div>";
                     } else{
                         document.userINFO.userNICKNAME_DUPLICATION.value = "NICKNAMEUncheck";
-                        document.getElementById("nickmsg").innerHTML ="이미 존재하는 닉네임입니다";
+                        document.getElementById("nickmsg").innerHTML ="<div style='color: red;'>이미 존재하는 닉네임입니다</div>";
                     } 
                 },
                 error : function(){
@@ -148,16 +149,19 @@ function regNICKNAMECheck()
 function notEMAILClick()
 {
     document.userINFO.userEMAIL_DUPLICATION.value = "EMAILUncheck";
-    document.getElementById("emailmsg").innerHTML = "이메일 중복확인 부탁드립니다";
+    document.getElementById("emailmsg").innerHTML = "<div style='color: red;'>이메일 중복확인 부탁드립니다</div>";
 }
 
 // 이메일 중복검사
 function regEMAILCheck()
 {
     var userEMAIL = $('#userEMAIL').val();
+    var pat_spc = /[@]/;
 
     if(!userEMAIL) {
-        document.getElementById("emailmsg").innerHTML = "이메일 입력바랍니다"
+        document.getElementById("emailmsg").innerHTML = "<div style='color: red;'>이메일 입력바랍니다</div>"
+    } else if((pat_spc.test(userEMAIL)) == false) {
+        document.getElementById("emailmsg").innerHTML ="<div style='color: red;'>이메일 형식이 아닙니다</div>";
     } else {
         $.ajax({
         url : "../userEMAILCheck",
@@ -166,10 +170,10 @@ function regEMAILCheck()
         success : function(result){
             if(result == 1){
                 document.userINFO.userEMAIL_DUPLICATION.value = "EMAILCheck";
-                document.getElementById("emailmsg").innerHTML ="사용 가능한 이메일입니다";
+                document.getElementById("emailmsg").innerHTML ="<div style='color: green;'>사용 가능한 이메일입니다</div>";
             } else{
                 document.userINFO.userEMAIL_DUPLICATION.value = "EMAILUncheck";
-                document.getElementById("emailmsg").innerHTML ="이미 가입한 이메일입니다";
+                document.getElementById("emailmsg").innerHTML ="<div style='color: red;'>이미 가입한 이메일입니다</div>";
             } 
         },
         error : function(){
