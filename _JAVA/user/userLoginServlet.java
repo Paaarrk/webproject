@@ -8,6 +8,7 @@ import javax.servlet.annotation.WebServlet;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -27,12 +28,14 @@ public class userLoginServlet extends HttpServlet {
         
         if (result == 1) {
 
+            HttpSession session = request.getSession();
+
             request.setAttribute("userID", memId);
+            session.setAttribute("userID", memId);
 
-            ServletContext context = getServletContext();
-            RequestDispatcher dispatcher = context.getRequestDispatcher("/main/main.jsp");
+            System.out.println("Session생성: "+session);
 
-            dispatcher.forward(request,response);
+            response.sendRedirect("main/main.jsp");
 
         } else {
             response.sendRedirect("main/login.jsp");

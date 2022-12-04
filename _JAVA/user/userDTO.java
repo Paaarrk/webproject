@@ -1,5 +1,7 @@
 package user;
 
+import java.sql.Date;
+
 public class userDTO {
         // 회원 id
         private String memId;
@@ -35,7 +37,10 @@ public class userDTO {
         private int exp;
     
         // 가입일
-        private int regDate;
+        private Date regDate;
+
+        // 관리자권한
+        private int auth;
     
         public String getmemId() {
             return memId;
@@ -125,11 +130,19 @@ public class userDTO {
             this.exp = exp;
         }
     
-        public int getregDate() {
+        public Date getregDate() {
             return regDate;
         }
     
-        public void setregDate(int regDate) {
+        public void setregDate(Date regDate) {
             this.regDate = regDate;
+        }
+
+        public int getAuth() {
+            return auth;
+        }
+
+        public void setAuth(int auth) {
+            this.auth = auth;
         }
 }

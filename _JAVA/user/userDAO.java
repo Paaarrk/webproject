@@ -2,7 +2,6 @@ package user;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
@@ -13,8 +12,8 @@ public class userDAO {
     public userDAO() {
         try {
             String dbURL = "jdbc:mysql://localhost:3306/webproject?useSSL=false&useUnicode=true&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&serverTimezone=UTC";
-            String dbID
-            String dbPassword
+            String dbID =
+            String dbPassword =
             Class.forName("com.mysql.cj.jdbc.Driver");
             conn = DriverManager.getConnection(dbURL, dbID, dbPassword);
 
@@ -166,6 +165,126 @@ public class userDAO {
         }
 
         System.out.println("데이터베이스 오류");
+        return -1;
+    }
+
+    //회원 정보 출력
+    public userDTO userinformation(String userId)
+    {
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        String SQL = "SELECT * FROM webproject.memberinfo WHERE (ID = ?)";
+        try {
+            pstmt = conn.prepareStatement(SQL);
+            pstmt.setString(1, userId);
+            rs = pstmt.executeQuery();
+
+            if(rs.next()) {
+                // 정보 DTO 에 하나씩 저장
+                userDTO User = new userDTO();
+                User.setmemId(rs.getString(1));
+                User.setmemPw(rs.getString(2));
+                User.setmemName(rs.getString(3));
+                User.setnickName(rs.getString(4));
+                User.setgender(rs.getString(5));
+                User.sete_mail(rs.getString(6));
+                User.setphoneNum(rs.getString(7));
+                User.setcoin(rs.getInt(8));
+                User.setcash(rs.getInt(9));
+                User.setlevel(rs.getInt(10));
+                User.setexp(rs.getInt(11));
+                User.setregDate(rs.getDate(12));
+                User.setAuth(rs.getInt(13));
+
+                return User;
+
+            } else {
+                System.out.println("존재하지 않는 아이디");
+                return null;
+            }
+        } catch (Exception e) {
+            System.out.println("회원정보출력 도중 오류 발생");
+            e.printStackTrace();
+        } finally {
+            try {
+                if(rs != null) rs.close();
+                if(pstmt != null) pstmt.close();
+            } catch (Exception e) {
+                System.out.println("회원정보출력 삭제중 오류 발생");
+                e.printStackTrace();
+            }
+        }
+
+        System.out.println("회원 정보 출력 실패");
+        return null;
+    }
+
+    //글쓰면 코인 주기
+    public int userWrite(String userId)
+    {
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        String SQL = "SELECT * FROM webproject.memberinfo WHERE (ID = ?)";
+        try {
+            pstmt = conn.prepareStatement(SQL);
+            pstmt.setString(1, userId);
+            rs = pstmt.executeQuery();
+            int result = 0;
+            int coin = 0;
+
+            if(rs.next()) {
+                // 정보 DTO 에 하나씩 저장
+                userDTO User = new userDTO();
+                User.setmemId(rs.getString(1));
+                User.setmemPw(rs.getString(2));
+                User.setmemName(rs.getString(3));
+                User.setnickName(rs.getString(4));
+                User.setgender(rs.getString(5));
+                User.sete_mail(rs.getString(6));
+                User.setphoneNum(rs.getString(7));
+                User.setcoin(rs.getInt(8));
+                User.setcash(rs.getInt(9));
+                User.setlevel(rs.getInt(10));
+                User.setexp(rs.getInt(11));
+                User.setregDate(rs.getDate(12));
+                User.setAuth(rs.getInt(13));
+
+                coin = User.getcoin();
+                coin = coin + 500;
+                User.setcoin(coin);
+
+                SQL = "UPDATE webproject.memberinfo SET Coin = ? WHERE (ID = ?)";
+                try {
+                    pstmt = conn.prepareStatement(SQL);
+                    pstmt.setInt(1, coin);
+                    pstmt.setString(2, userId);
+                    result = pstmt.executeUpdate();
+                } catch (Exception e) {
+                    System.out.println("코인 수급실패");
+                    result = 0;
+                    e.printStackTrace();
+                }
+
+                return result;
+
+            } else {
+                System.out.println("존재하지 않는 아이디");
+                return -1;
+            }
+        } catch (Exception e) {
+            System.out.println("정보 업데이트 실패");
+            e.printStackTrace();
+        } finally {
+            try {
+                if(rs != null) rs.close();
+                if(pstmt != null) pstmt.close();
+            } catch (Exception e) {
+                System.out.println("정보업데이트 실패함");
+                e.printStackTrace();
+            }
+        }
+
+        System.out.println("회원 정보 출력 실패");
         return -1;
     }
 }

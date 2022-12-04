@@ -15,7 +15,7 @@
 }
 
 thead {
-    background-color: #0894d4;
+    background-color: #6e6e6e;
     color: white;
     text-align: center;
 }
@@ -30,6 +30,9 @@ h4 {
     margin: 0 auto 0 auto;
 }
 
+
+
+/* 로그인 페이지 */
 #login {
     margin-left: auto; 
     margin-right: auto; 
@@ -37,4 +40,45 @@ h4 {
     text-align: center; 
     width: 500px; 
     border: 3px solid #dddddd
+}
+
+
+/* 메인페이지 */
+
+    /* 유저인포테이블 */
+#Userinfo {
+    margin-left: 0.5x; 
+    margin-right: 0.5px; 
+    text-align: center; 
+    width: 400px; 
+    border: 1px solid #dddddd
+}
+
+    /* 페이지 형태관리 */
+.maincontainer {
+    margin-right: auto;
+    margin-left: auto;
+    width: 1024px;
+}
+
+header {
+    font-family: 'Hanna';
+    
+    width: 1024px;
+    height: 300px;
+    background-image: url(./img/header.jpg);
+    margin-left: auto;
+    margin-right: auto;
+}
+
+aside {
+    width: 406px;
+    
+    float: right;
+    background: #f0efef;
+}
+
+section {
+    width: 600px;
+    float: left;
 }

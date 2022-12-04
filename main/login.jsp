@@ -51,7 +51,7 @@
 
                 <tr>
                     <td style="width: 330px; text-align: right;" colspan="2">
-                        <div id="msg"><h5>○○○○○○에 오신것을 환영합니다!</h5></div>
+                        <div id="msg"><h5><span style="color: #00c5f7">놀이터</span>에 오신것을 환영합니다!</h5></div>
                     </td>
                     <td colspan="1" style="text-align: center;">
                         <input class="btn btn-primary pull-right" type="button" value="회원가입" onclick="goRegfrom()">

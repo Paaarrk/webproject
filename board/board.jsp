@@ -1,6 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <% request.setCharacterEncoding("UTF-8"); %>
 
+<%@ page import="java.io.PrintWriter" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="board.boardDAO" %>
+<%@ page import="board.boardDTO" %>
+
 
 <!DOCTYPE html>
 <html>
@@ -9,13 +14,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/asset/css/bootstrap.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/asset/css/custom.css">
-    <title>메인 페이지</title>
+    <title>게시판</title>
     <script src="${pageContext.request.contextPath}/asset/js/jquery-3.6.1.min.js"></script>
     <script src="${pageContext.request.contextPath}/asset/js/bootstrap.js"></script>
     <%
         String id = null;
         if (session.getAttribute("userID") != null) {
             id = (String) session.getAttribute("userID");
+        }
+
+        int pagenumber = 1;
+        if(request.getParameter("pageNumber") != null) {
+            pagenumber = Integer.parseInt(request.getParameter("pageNumber"));
         }
     %>
     <script>
@@ -56,6 +66,13 @@
             location.href = '../main/logout.jsp';
         }
     </script>
+
+    <style type="text/css">
+        a, a:hover {
+            color: #000000;
+            text-decoration: none;
+        }
+    </style>
 </head>
 
 <body>
@@ -76,11 +93,11 @@
 
         <div class="collapse navbar-collapse" id="header_nav">
             <ul class="nav navbar-nav mr-auto">
-                <li class="nav-item active">
-                    <a class="nav-link" href="../main/main.jsp" style="color:#000">메인</a>
-                </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="../board/board.jsp">게시판</a>
+                    <a class="nav-link" href="../main/main.jsp">메인</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="../board/board.jsp" style="color:#000">게시판</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">거래소</a>
@@ -91,7 +108,6 @@
             </ul>
         </div>
     </nav>
-    
     
     <aside>
         <div id="information" style="width: 400px; height:200px">
@@ -123,8 +139,49 @@
     </aside>
 
     <section>
-        
+        <div class="row">
+            <table class="table table-striped" style="text-align: center; border: 1px solid #dddddd">
+                <thead>
+                    <tr>
+                        <th style="background-color: #6e6e6e; text-align: center;">번호</th>
+                        <th style="background-color: #6e6e6e; text-align: center;">제목</th>
+                        <th style="background-color: #6e6e6e; text-align: center;">작성자</th>
+                        <th style="background-color: #6e6e6e; text-align: center;">작성일</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <%
+                        boardDAO boardDao = new boardDAO();
+                        ArrayList<boardDTO> list = boardDao.getList(pagenumber);
+                        for(int i = 0; i < list.size(); i++) {
+                    %>
+                    <tr>
+                        <td><%= list.get(i).getboardID() %></td>
+                        <td><a href="../board/view.jsp?boardID=<%= list.get(i).getboardID() %>"><%= list.get(i).getboardTitle() %></a></td>
+                        <td><%= list.get(i).getID() %></td>
+                        <td><%= list.get(i).getboardDate().substring(0,11) + list.get(i).getboardDate().substring(11, 13) +"시" + list.get(i).getboardDate().substring(14,16) + "분 " + list.get(i).getboardDate().substring(17,19) + "초" %></td>
+                    </tr>
+                    <%
+                        }
+                    %>
+                </tbody>
+            </table>
+            <%
+                if(pagenumber !=1) {
+            %>
+                    <a style="width: 100px;" href="../board/board.jsp?pageNumber=<%= pagenumber - 1 %>" class="btn btn-success btn-arrow-left">이전</a>
+            <%
+                } if(boardDao.nextPage(pagenumber + 1)) {
+            %>
+                    <a style="width: 100px;" href="../board/board.jsp?pageNumber=<%= pagenumber + 1 %>" class="btn btn-success btn-arrow-left">다음</a>
+            <%
+                }
+            %>
+            <a href="../board/write.jsp" class="btn btn-primary" style="width: 100px;">글쓰러가기</a> 글을 쓰시면 코인 500개를 얻으실 수 있습니다
+        </div>
+
     </section>
+    
 </div>
 </body>
 </html>

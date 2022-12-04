@@ -9,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/asset/css/bootstrap.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/asset/css/custom.css">
-    <title>메인 페이지</title>
+    <title>글쓰기</title>
     <script src="${pageContext.request.contextPath}/asset/js/jquery-3.6.1.min.js"></script>
     <script src="${pageContext.request.contextPath}/asset/js/bootstrap.js"></script>
     <%
@@ -51,10 +51,27 @@
                 })
             }
         } 
+
         
         function logout() {
             location.href = '../main/logout.jsp';
         }
+
+        // 제목 내용 비었나 확인
+        function checkValue() {
+            var form = document.userWRITE;
+
+            if(!form.boardTitle.value){
+                alert("글의 제목을 입력하세요.");
+                return false;
+            }
+
+            if(!form.boardContent.value){
+                alert("글의 내용을 입력하세요.");
+                return false;
+            }
+        }
+        
     </script>
 </head>
 
@@ -76,11 +93,11 @@
 
         <div class="collapse navbar-collapse" id="header_nav">
             <ul class="nav navbar-nav mr-auto">
-                <li class="nav-item active">
-                    <a class="nav-link" href="../main/main.jsp" style="color:#000">메인</a>
-                </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="../board/board.jsp">게시판</a>
+                    <a class="nav-link" href="../main/main.jsp">메인</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="../board/board.jsp" style="color:#000">게시판</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">거래소</a>
@@ -91,7 +108,6 @@
             </ul>
         </div>
     </nav>
-    
     
     <aside>
         <div id="information" style="width: 400px; height:200px">
@@ -123,8 +139,30 @@
     </aside>
 
     <section>
-        
+        <div class="row">
+        <form name="userWRITE" method="post" action="../board/writeAction.jsp" onsubmit="return checkValue()">
+            <table class="table table-striped" style="text-align: center; border: 1px solid #dddddd">
+                <thead>
+                    <tr>
+                        <th colsapn="2" style="background-color: #6e6e6e; text-align: center;">게시판 글쓰기 양식</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="text" class="form-control" placeholder="글 제목" name="boardTitle" maxlength="50"></td>
+                    </tr>
+                    <tr>
+                        <td><input type="textarea" class="form-control" placeholder="글 내용" name="boardContent" maxlength="2048" style="height: 330px"></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <input type="submit" class="btn btn-primary" value="글쓰기" style="width: 100px;">
+        </form>
+        </div>
+
     </section>
+    
 </div>
 </body>
 </html>
