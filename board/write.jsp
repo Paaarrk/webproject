@@ -47,6 +47,7 @@
                     },
                     error : function(){
                     alert("서버요청실패");
+                    location.href = '../main/logout.jsp';
                     }
                 })
             }
@@ -103,7 +104,7 @@
                     <a class="nav-link" href="#">거래소</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">미니게임</a>
+                    <a class="nav-link" href="../gacha/gacha.jsp">Gacha</a>
                 </li>
             </ul>
         </div>
@@ -152,7 +153,7 @@
                         <td><input type="text" class="form-control" placeholder="글 제목" name="boardTitle" maxlength="50"></td>
                     </tr>
                     <tr>
-                        <td><input type="textarea" class="form-control" placeholder="글 내용" name="boardContent" maxlength="2048" style="height: 330px"></td>
+                        <td><textarea type="text" class="form-control" placeholder="글 내용" name="boardContent" maxlength="2048" style="height: 330px"></textarea></td>
                     </tr>
                 </tbody>
             </table>

@@ -9,6 +9,15 @@ public class boardDTO {
     private int boardAvailable;
     private int boardType;
 
+    private String Nickname; //JOIN할때만 씁니다
+    public String getNickname() {
+        return this.Nickname;
+    }
+    public void setNickname(String Nickname) {
+        this.Nickname = Nickname;
+    }
+
+
     public int getboardID() {
         return this.boardID;
     }

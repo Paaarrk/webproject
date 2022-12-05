@@ -1,10 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <% request.setCharacterEncoding("UTF-8"); %>
 
-<%@ page import="java.io.PrintWriter" %>
-<%@ page import="java.util.ArrayList" %>
-<%@ page import="board.boardDAO" %>
 <%@ page import="board.boardDTO" %>
+<%@ page import="board.boardDAO" %>
+<%@ page import="java.io.PrintWriter" %>
 
 
 <!DOCTYPE html>
@@ -14,7 +13,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/asset/css/bootstrap.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/asset/css/custom.css">
-    <title>게시판</title>
+    <title>글쓰기</title>
     <script src="${pageContext.request.contextPath}/asset/js/jquery-3.6.1.min.js"></script>
     <script src="${pageContext.request.contextPath}/asset/js/bootstrap.js"></script>
     <%
@@ -23,10 +22,18 @@
             id = (String) session.getAttribute("userID");
         }
 
-        int pagenumber = 1;
-        if(request.getParameter("pageNumber") != null) {
-            pagenumber = Integer.parseInt(request.getParameter("pageNumber"));
+        int boardid = 0;
+        if (request.getParameter("boardID") != null) {
+            boardid = Integer.parseInt(request.getParameter("boardID"));
         }
+        if (boardid == 0) {
+            PrintWriter script = response.getWriter();
+            script.println("<script>");
+            script.println("alert('유효하지 않은 게시물입니다.')");
+            script.println("location.href = '../board/board.jsp'");
+            script.println("</script>");
+        } 
+        boardDTO boardDto = new boardDAO().getboardDTO(boardid);
     %>
     <script>
         
@@ -62,18 +69,13 @@
                 })
             }
         } 
+
         
         function logout() {
             location.href = '../main/logout.jsp';
         }
+        
     </script>
-
-    <style type="text/css">
-        a, a:hover {
-            color: #000000;
-            text-decoration: none;
-        }
-    </style>
 </head>
 
 <body>
@@ -144,43 +146,38 @@
             <table class="table table-striped" style="text-align: center; border: 1px solid #dddddd">
                 <thead>
                     <tr>
-                        <th style="background-color: #6e6e6e; text-align: center;">번호</th>
-                        <th style="background-color: #6e6e6e; text-align: center;">제목</th>
-                        <th style="background-color: #6e6e6e; text-align: center;">작성자</th>
-                        <th style="background-color: #6e6e6e; text-align: center;">작성일</th>
+                        <th colspan="3" style="background-color: #6e6e6e; text-align: center;">게시글 보기</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <%
-                        boardDAO boardDao = new boardDAO();
-                        ArrayList<boardDTO> list = boardDao.getList(pagenumber);
-                        for(int i = 0; i < list.size(); i++) {
-                    %>
                     <tr>
-                        <td><%= list.get(i).getboardID() %></td>
-                        <td><a href="../board/view.jsp?boardID=<%= list.get(i).getboardID() %>"><%= list.get(i).getboardTitle().replaceAll(" ", "&nbsp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\n", "<br>") %></a></td>
-                        <td><%= list.get(i).getNickname() %></td>
-                        <td><%= list.get(i).getboardDate().substring(0,11) + list.get(i).getboardDate().substring(11, 13) +"시" + list.get(i).getboardDate().substring(14,16) + "분 " + list.get(i).getboardDate().substring(17,19) + "초" %></td>
+                        <td style="width: 20%;">게시글 제목</td>
+                        <td colspan="2"><%= boardDto.getboardTitle().replaceAll(" ", "&nbsp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\n", "<br>") %></td>
                     </tr>
-                    <%
-                        }
-                    %>
+                    <tr>
+                        <td>작성자</td>
+                        <td colspan="2"><%= boardDto.getNickname() %></td>
+                    </tr>
+                    <tr>
+                        <td>작성일자</td>
+                        <td colspan="2"><%= boardDto.getboardDate().substring(0,11) + boardDto.getboardDate().substring(11, 13) +"시" + boardDto.getboardDate().substring(14,16) + "분 " + boardDto.getboardDate().substring(17,19) + "초" %></td>
+                    </tr>
+                    <tr>
+                        <td>내용</td>
+                        <td colspan="2" style="min-height: 200px; text-align: left;"><%= boardDto.getboardContent().replaceAll(" ", "&nbsp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\n", "<br>") %></td>
+                    </tr>
                 </tbody>
             </table>
+            <a href="../board/board.jsp" class="btn btn-primary" style="width: 80px">목록</a>
             <%
-                if(pagenumber !=1) {
+                if(id != null && id.equals(boardDto.getID())) {
             %>
-                    <a style="width: 100px;" href="../board/board.jsp?pageNumber=<%= pagenumber - 1 %>" class="btn btn-success btn-arrow-left">이전</a>
-            <%
-                } if(boardDao.nextPage(pagenumber + 1)) {
-            %>
-                    <a style="width: 100px;" href="../board/board.jsp?pageNumber=<%= pagenumber + 1 %>" class="btn btn-success btn-arrow-left">다음</a>
+                    <a href = "../board/update.jsp?boardID=<%= boardid %>" class="btn btn-primary" style="width: 80px">수정</a>
+                    <a href = "../board/deleteAction.jsp?boardID=<%= boardid %>" class="btn btn-primary" style="width: 80px">삭제</a>
             <%
                 }
             %>
-            <a href="../board/write.jsp" class="btn btn-primary" style="width: 100px;">글쓰러가기</a>  
-            <span style="color: blue">제목을 클릭하시면 글내용을 확인할 수 있습니다</span>
-            <br><span style="color: green">글을 쓰시면 코인 500개를 얻으실 수 있습니다</span>
+            
         </div>
 
     </section>

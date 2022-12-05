@@ -287,4 +287,124 @@ public class userDAO {
         System.out.println("회원 정보 출력 실패");
         return -1;
     }
+
+    // 코인갯수체크
+    public int enoughcoin(String userId, int coinneed)
+    {
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        String SQL = "SELECT * FROM webproject.memberinfo WHERE (ID = ?)";
+        try {
+            pstmt = conn.prepareStatement(SQL);
+            pstmt.setString(1, userId);
+            rs = pstmt.executeQuery();
+            int result = 0;
+            int coin = 0;
+
+            if(rs.next()) {
+                // 정보 DTO 에 하나씩 저장
+                userDTO User = new userDTO();
+                
+                User.setcoin(rs.getInt(8));
+
+                coin = User.getcoin();
+                if(coin<coinneed) {
+                    result = 0;
+                } else {
+                    result = 1;
+                }
+
+                return result;
+
+            } else {
+                System.out.println("존재하지 않는 아이디");
+                return -1;
+            }
+        } catch (Exception e) {
+            System.out.println("정보 업데이트 실패");
+            e.printStackTrace();
+        } finally {
+            try {
+                if(rs != null) rs.close();
+                if(pstmt != null) pstmt.close();
+            } catch (Exception e) {
+                System.out.println("정보업데이트 실패함");
+                e.printStackTrace();
+            }
+        }
+
+        System.out.println("회원 정보 출력 실패");
+        return -1;
+    }
+
+
+    // 코인 증감
+    public int coin(String userId, int coinadd)
+    {
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        String SQL = "SELECT * FROM webproject.memberinfo WHERE (ID = ?)";
+        try {
+            pstmt = conn.prepareStatement(SQL);
+            pstmt.setString(1, userId);
+            rs = pstmt.executeQuery();
+            int result = 0;
+            int coin = 0;
+
+            if(rs.next()) {
+                // 정보 DTO 에 하나씩 저장
+                userDTO User = new userDTO();
+                User.setmemId(rs.getString(1));
+                User.setmemPw(rs.getString(2));
+                User.setmemName(rs.getString(3));
+                User.setnickName(rs.getString(4));
+                User.setgender(rs.getString(5));
+                User.sete_mail(rs.getString(6));
+                User.setphoneNum(rs.getString(7));
+                User.setcoin(rs.getInt(8));
+                User.setcash(rs.getInt(9));
+                User.setlevel(rs.getInt(10));
+                User.setexp(rs.getInt(11));
+                User.setregDate(rs.getDate(12));
+                User.setAuth(rs.getInt(13));
+
+                coin = User.getcoin();
+                coin = coin + coinadd;
+                User.setcoin(coin);
+
+                SQL = "UPDATE webproject.memberinfo SET Coin = ? WHERE (ID = ?)";
+                try {
+                    pstmt = conn.prepareStatement(SQL);
+                    pstmt.setInt(1, coin);
+                    pstmt.setString(2, userId);
+                    result = pstmt.executeUpdate();
+                } catch (Exception e) {
+                    System.out.println("코인 계산 실패");
+                    result = -1;
+                    e.printStackTrace();
+                }
+
+                return result;
+
+            } else {
+                System.out.println("존재하지 않는 아이디");
+                return -1;
+            }
+        } catch (Exception e) {
+            System.out.println("정보 업데이트 실패");
+            e.printStackTrace();
+        } finally {
+            try {
+                if(rs != null) rs.close();
+                if(pstmt != null) pstmt.close();
+            } catch (Exception e) {
+                System.out.println("정보업데이트 실패함");
+                e.printStackTrace();
+            }
+        }
+
+        System.out.println("회원 정보 출력 실패");
+        return -1;
+    }
+    
 }

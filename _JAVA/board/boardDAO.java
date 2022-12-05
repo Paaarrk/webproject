@@ -12,8 +12,8 @@ public class boardDAO {
     public boardDAO() {
         try {
             String dbURL = "jdbc:mysql://localhost:3306/webproject?useSSL=false&useUnicode=true&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&serverTimezone=UTC";
-            String dbID = 
-            String dbPassword = 
+            String dbID =
+            String dbPassword =
             Class.forName("com.mysql.cj.jdbc.Driver");
             conn = DriverManager.getConnection(dbURL, dbID, dbPassword);
 
@@ -39,6 +39,7 @@ public class boardDAO {
         return ""; //데이터 베이스 오류
     }
 
+    //다음 글 확인
     public int getNext() {
         String SQL = "SELECT boardID FROM webproject.boardinfo ORDER BY boardID DESC";
         try {
@@ -58,6 +59,7 @@ public class boardDAO {
         return -1; //데이터 베이스 오류
     }
 
+    //글쓰기
     public int write(String boardTitle, String ID, String boardContent) {
         String SQL = "INSERT INTO webproject.boardinfo VALUES (?, ?, ?, ?, ?, ?, ?)";
         try {
@@ -80,8 +82,9 @@ public class boardDAO {
         return -1; //데이터 베이스 오류
     }
 
+    //게시글 목록 가져오기
     public ArrayList<boardDTO> getList(int pageNumber) {
-        String SQL = "SELECT * FROM webproject.boardinfo WHERE boardID < ? AND boardAvailable = 1 ORDER BY boardID DESC LIMIT 10";
+        String SQL = "SELECT boardID, boardTitle, webproject.boardinfo.ID, boardDate, boardContent, boardAvailable, boardType, webproject.memberinfo.NickName FROM webproject.boardinfo LEFT JOIN webproject.memberinfo ON webproject.boardinfo.ID = webproject.memberinfo.ID WHERE boardID < ? AND boardAvailable = 1 ORDER BY boardID DESC LIMIT 10";
         ArrayList<boardDTO> list = new ArrayList<boardDTO>();
         try {
             ResultSet rs = null;
@@ -98,6 +101,9 @@ public class boardDAO {
                 boardDto.setboardContent(rs.getString(5));
                 boardDto.setboardAvailable(rs.getInt(6));
                 boardDto.setboardType(rs.getInt(7));
+
+                //닉네임 추가
+                boardDto.setNickname(rs.getString(8));
                 list.add(boardDto);
             }
         } catch (Exception e) {
@@ -124,4 +130,70 @@ public class boardDAO {
         
         return false;
     }
+
+    //게시글 보기
+    public boardDTO getboardDTO(int boardID) {
+        String SQL = "SELECT boardID, boardTitle, webproject.boardinfo.ID, boardDate, boardContent, boardAvailable, boardType, webproject.memberinfo.NickName FROM webproject.boardinfo LEFT JOIN webproject.memberinfo ON webproject.boardinfo.ID = webproject.memberinfo.ID WHERE boardID = ?  ";
+        try {
+            ResultSet rs = null;
+            PreparedStatement pstmt = conn.prepareStatement(SQL);
+            pstmt.setInt(1, boardID);
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                boardDTO boardDto = new boardDTO();
+
+                boardDto.setboardID(rs.getInt(1));
+                boardDto.setboardTitle(rs.getString(2));
+                boardDto.setID(rs.getString(3));
+                boardDto.setboardDate(rs.getString(4));
+                boardDto.setboardContent(rs.getString(5));
+                boardDto.setboardAvailable(rs.getInt(6));
+                boardDto.setboardType(rs.getInt(7));
+
+                //닉네임 추가
+                boardDto.setNickname(rs.getString(8));
+                return boardDto;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
+        
+        return null; //해당 글이 존재하지 않습니다
+    }
+
+    //게시글 수정
+    public int update(int boardID, String boardTitle, String boardContent) {
+        String SQL = "UPDATE webproject.boardinfo SET boardTitle = ?, boardContent = ? WHERE boardID = ?";
+        try {
+            PreparedStatement pstmt = conn.prepareStatement(SQL);
+
+            pstmt.setString(1, boardTitle);
+            pstmt.setString(2, boardContent);
+            pstmt.setInt(3, boardID);
+            
+            return pstmt.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
+
+        return -1; //데이터 베이스 오류
+    }
+
+    public int delete(int boardID) {
+        String SQL = "UPDATE webproject.boardinfo SET boardAvailable = 0 WHERE boardID = ?";
+        try {
+            PreparedStatement pstmt = conn.prepareStatement(SQL);
+
+            pstmt.setInt(1, boardID);
+            
+            return pstmt.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
+        return -1; //데이터베이스 오류
+    }
+
+    
 }

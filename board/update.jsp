@@ -2,9 +2,45 @@
 <% request.setCharacterEncoding("UTF-8"); %>
 
 <%@ page import="java.io.PrintWriter" %>
-<%@ page import="java.util.ArrayList" %>
 <%@ page import="board.boardDAO" %>
 <%@ page import="board.boardDTO" %>
+
+<%
+    String id = null;
+    if (session.getAttribute("userID") != null) {
+        id = (String) session.getAttribute("userID");
+    }
+
+        
+    if(id == null) {
+        PrintWriter script = response.getWriter();
+        script.println("<script>");
+        script.println("alert('로그아웃 되었습니다')");
+        script.println("location.href = '../main/login.jsp'");
+        script.println("</script>");
+    }
+
+    int boardid = 0;
+    if (request.getParameter("boardID") != null) {
+        boardid = Integer.parseInt(request.getParameter("boardID"));
+    }
+    if (boardid == 0) {
+        PrintWriter scri = response.getWriter();
+        scri.println("<script>");
+        scri.println("alert('유효하지 않은 게시물입니다.')");
+        scri.println("location.href = '../board/board.jsp'");
+        scri.println("</script>");
+    } 
+
+    boardDTO boardDto = new boardDAO().getboardDTO(boardid);
+    if (!id.equals(boardDto.getID())) {
+        PrintWriter scrip = response.getWriter();
+        scrip.println("<script>");
+        scrip.println("alert('권한이 없습니다')");
+        scrip.println("location.href = '../board/board.jsp'");
+        scrip.println("</script>");
+    }
+%>
 
 
 <!DOCTYPE html>
@@ -14,23 +50,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/asset/css/bootstrap.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/asset/css/custom.css">
-    <title>게시판</title>
+    <title>글쓰기</title>
     <script src="${pageContext.request.contextPath}/asset/js/jquery-3.6.1.min.js"></script>
     <script src="${pageContext.request.contextPath}/asset/js/bootstrap.js"></script>
-    <%
-        String id = null;
-        if (session.getAttribute("userID") != null) {
-            id = (String) session.getAttribute("userID");
-        }
+    
 
-        int pagenumber = 1;
-        if(request.getParameter("pageNumber") != null) {
-            pagenumber = Integer.parseInt(request.getParameter("pageNumber"));
-        }
-    %>
-    <script>
-        
-        
+    <script>  
         // 화면에 유저정보를 출력하기위해 데이터 받아오기
         window.onload = function loadinfo() {
             var memID = '<%= id%>';
@@ -62,18 +87,28 @@
                 })
             }
         } 
+
         
         function logout() {
             location.href = '../main/logout.jsp';
         }
-    </script>
 
-    <style type="text/css">
-        a, a:hover {
-            color: #000000;
-            text-decoration: none;
+        // 제목 내용 비었나 확인
+        function checkValue() {
+            var form = document.userWRITE;
+
+            if(!form.boardTitle.value){
+                alert("글의 제목을 입력하세요.");
+                return false;
+            }
+
+            if(!form.boardContent.value){
+                alert("글의 내용을 입력하세요.");
+                return false;
+            }
         }
-    </style>
+        
+    </script>
 </head>
 
 <body>
@@ -141,46 +176,25 @@
 
     <section>
         <div class="row">
+        <form name="userWRITE" method="post" action="../board/updateAction.jsp?boardID=<%= boardid %>" onsubmit="return checkValue()">
             <table class="table table-striped" style="text-align: center; border: 1px solid #dddddd">
                 <thead>
                     <tr>
-                        <th style="background-color: #6e6e6e; text-align: center;">번호</th>
-                        <th style="background-color: #6e6e6e; text-align: center;">제목</th>
-                        <th style="background-color: #6e6e6e; text-align: center;">작성자</th>
-                        <th style="background-color: #6e6e6e; text-align: center;">작성일</th>
+                        <th colsapn="2" style="background-color: #6e6e6e; text-align: center;">게시판 글수정</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <%
-                        boardDAO boardDao = new boardDAO();
-                        ArrayList<boardDTO> list = boardDao.getList(pagenumber);
-                        for(int i = 0; i < list.size(); i++) {
-                    %>
                     <tr>
-                        <td><%= list.get(i).getboardID() %></td>
-                        <td><a href="../board/view.jsp?boardID=<%= list.get(i).getboardID() %>"><%= list.get(i).getboardTitle().replaceAll(" ", "&nbsp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\n", "<br>") %></a></td>
-                        <td><%= list.get(i).getNickname() %></td>
-                        <td><%= list.get(i).getboardDate().substring(0,11) + list.get(i).getboardDate().substring(11, 13) +"시" + list.get(i).getboardDate().substring(14,16) + "분 " + list.get(i).getboardDate().substring(17,19) + "초" %></td>
+                        <td><input type="text" class="form-control" placeholder="글 제목" name="boardTitle" maxlength="50" value="<%= boardDto.getboardTitle() %>"></td>
                     </tr>
-                    <%
-                        }
-                    %>
+                    <tr>
+                        <td><textarea type="text" class="form-control" placeholder="글 내용" name="boardContent" maxlength="2048" style="height: 330px"><%= boardDto.getboardContent() %></textarea></td>
+                    </tr>
                 </tbody>
             </table>
-            <%
-                if(pagenumber !=1) {
-            %>
-                    <a style="width: 100px;" href="../board/board.jsp?pageNumber=<%= pagenumber - 1 %>" class="btn btn-success btn-arrow-left">이전</a>
-            <%
-                } if(boardDao.nextPage(pagenumber + 1)) {
-            %>
-                    <a style="width: 100px;" href="../board/board.jsp?pageNumber=<%= pagenumber + 1 %>" class="btn btn-success btn-arrow-left">다음</a>
-            <%
-                }
-            %>
-            <a href="../board/write.jsp" class="btn btn-primary" style="width: 100px;">글쓰러가기</a>  
-            <span style="color: blue">제목을 클릭하시면 글내용을 확인할 수 있습니다</span>
-            <br><span style="color: green">글을 쓰시면 코인 500개를 얻으실 수 있습니다</span>
+
+            <input type="submit" class="btn btn-primary" value="수정하기" style="width: 100px;">
+        </form>
         </div>
 
     </section>

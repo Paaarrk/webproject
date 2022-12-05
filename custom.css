@@ -82,3 +82,13 @@ section {
     width: 600px;
     float: left;
 }
+
+section1 {
+    width: 400px;
+    float: left;
+}
+
+section2 {
+    width: 200px;
+    float: right;
+}

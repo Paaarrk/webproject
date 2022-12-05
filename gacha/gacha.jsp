@@ -1,11 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <% request.setCharacterEncoding("UTF-8"); %>
 
-<%@ page import="java.io.PrintWriter" %>
-<%@ page import="java.util.ArrayList" %>
-<%@ page import="board.boardDAO" %>
-<%@ page import="board.boardDTO" %>
-
 
 <!DOCTYPE html>
 <html>
@@ -14,18 +9,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/asset/css/bootstrap.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/asset/css/custom.css">
-    <title>게시판</title>
+    <title>메인 페이지</title>
     <script src="${pageContext.request.contextPath}/asset/js/jquery-3.6.1.min.js"></script>
     <script src="${pageContext.request.contextPath}/asset/js/bootstrap.js"></script>
     <%
         String id = null;
         if (session.getAttribute("userID") != null) {
             id = (String) session.getAttribute("userID");
-        }
-
-        int pagenumber = 1;
-        if(request.getParameter("pageNumber") != null) {
-            pagenumber = Integer.parseInt(request.getParameter("pageNumber"));
         }
     %>
     <script>
@@ -66,14 +56,23 @@
         function logout() {
             location.href = '../main/logout.jsp';
         }
-    </script>
 
-    <style type="text/css">
-        a, a:hover {
-            color: #000000;
-            text-decoration: none;
+        //section 함수들
+        //weapongacha
+        function weapongacha() {
+            document.getElementById("weapongacha").innerHTML = '<div style="color: green; text-align: center; font-size: 30px;">무기 가챠하러 가기!</div>';
         }
-    </style>
+        function weapongacha_out() {
+            document.getElementById("weapongacha").innerHTML = '<div style="color: black; text-align: center; font-size: 30px;">당신도 행운의 주인공!</div>';
+        }
+        //accessarygacha
+        function accessarygacha() {
+            document.getElementById("accessarygacha").innerHTML = '<div style="color: green; text-align: center; font-size: 30px;">악세서리 가챠하러 가기!</div>';
+        }
+        function accessarygacha_out() {
+            document.getElementById("accessarygacha").innerHTML = '<div style="color: black; text-align: center; font-size: 30px;">당신도 행운의 주인공!</div>';
+        }
+    </script>
 </head>
 
 <body>
@@ -94,21 +93,22 @@
 
         <div class="collapse navbar-collapse" id="header_nav">
             <ul class="nav navbar-nav mr-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="../main/main.jsp">메인</a>
-                </li>
                 <li class="nav-item active">
-                    <a class="nav-link" href="../board/board.jsp" style="color:#000">게시판</a>
+                    <a class="nav-link" href="../main/main.jsp" >메인</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="../board/board.jsp">게시판</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">거래소</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="../gacha/gacha.jsp">Gacha</a>
+                    <a class="nav-link" href="../gacha/gacha.jsp" style="color:#000">Gacha</a>
                 </li>
             </ul>
         </div>
     </nav>
+    
     
     <aside>
         <div id="information" style="width: 400px; height:200px">
@@ -139,52 +139,49 @@
         </div>
     </aside>
 
-    <section>
-        <div class="row">
-            <table class="table table-striped" style="text-align: center; border: 1px solid #dddddd">
-                <thead>
-                    <tr>
-                        <th style="background-color: #6e6e6e; text-align: center;">번호</th>
-                        <th style="background-color: #6e6e6e; text-align: center;">제목</th>
-                        <th style="background-color: #6e6e6e; text-align: center;">작성자</th>
-                        <th style="background-color: #6e6e6e; text-align: center;">작성일</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <%
-                        boardDAO boardDao = new boardDAO();
-                        ArrayList<boardDTO> list = boardDao.getList(pagenumber);
-                        for(int i = 0; i < list.size(); i++) {
-                    %>
-                    <tr>
-                        <td><%= list.get(i).getboardID() %></td>
-                        <td><a href="../board/view.jsp?boardID=<%= list.get(i).getboardID() %>"><%= list.get(i).getboardTitle().replaceAll(" ", "&nbsp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\n", "<br>") %></a></td>
-                        <td><%= list.get(i).getNickname() %></td>
-                        <td><%= list.get(i).getboardDate().substring(0,11) + list.get(i).getboardDate().substring(11, 13) +"시" + list.get(i).getboardDate().substring(14,16) + "분 " + list.get(i).getboardDate().substring(17,19) + "초" %></td>
-                    </tr>
-                    <%
-                        }
-                    %>
-                </tbody>
-            </table>
-            <%
-                if(pagenumber !=1) {
-            %>
-                    <a style="width: 100px;" href="../board/board.jsp?pageNumber=<%= pagenumber - 1 %>" class="btn btn-success btn-arrow-left">이전</a>
-            <%
-                } if(boardDao.nextPage(pagenumber + 1)) {
-            %>
-                    <a style="width: 100px;" href="../board/board.jsp?pageNumber=<%= pagenumber + 1 %>" class="btn btn-success btn-arrow-left">다음</a>
-            <%
-                }
-            %>
-            <a href="../board/write.jsp" class="btn btn-primary" style="width: 100px;">글쓰러가기</a>  
-            <span style="color: blue">제목을 클릭하시면 글내용을 확인할 수 있습니다</span>
-            <br><span style="color: green">글을 쓰시면 코인 500개를 얻으실 수 있습니다</span>
-        </div>
+    <section1>
+        <a href="../gacha/weapongacha.jsp" height = "150" width = "400" onmouseover="weapongacha()" onmouseout="weapongacha_out()"><img src="../asset/css/img/weapongacha.jpg"></a>
 
-    </section>
-    
+        <br><div id="weapongacha" style="color: black; text-align: center; font-size: 30px;">당신도 행운의 주인공!</div><br>
+        <a href="../gacha/accessarygacha.jsp" height = "165" width = "400" onmouseover="accessarygacha()" onmouseout="accessarygacha_out()"><img src="../asset/css/img/accessarygacha.jpg"></a>
+        <br><div id="accessarygacha" style="color: black; text-align: center; font-size: 30px;">당신도 행운의 주인공!</div>
+    </section1>
+
+    <section2>
+        <div id="gachainfo" style="width: 190px">
+            <table class="table table-bordered table-hover" style="margin-top: 0%; margin-left: 5px; background: #eeeeee" id="Gachainfo">
+                <theaad>
+                    <th colspan="2" style="background: #dddddd">가챠 확률</th>
+                </theaad>
+                <tbody>
+                    <tr>
+                        <td style="width: 80px; color: #4ee462; background: #dddddd">레전더리</td>
+                        <td style="width: 110px">1%</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 80px; color: #eef109; background: #dddddd">유니크</td>
+                        <td style="width: 110px">3%</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 80px; color: #ad4ee4; background: #dddddd">에픽</td>
+                        <td style="width: 110px">5%</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 80px; color: #4e71e4; background: #dddddd">노멀</td>
+                        <td style="width: 110px">11%</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 80px; color: #000000; background: #dddddd">꽝</td>
+                        <td style="width: 110px">80%</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="color: #ff0000; background: #dddddd">가챠가격: 1회 3000코인</td>
+                    </tr>
+                </tbody>
+
+            </table>
+        </div>
+    </section2>
 </div>
 </body>
 </html>

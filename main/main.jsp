@@ -47,6 +47,7 @@
                     },
                     error : function(){
                     alert("서버요청실패");
+                    location.href = '../main/logout.jsp';
                     }
                 })
             }
@@ -86,7 +87,7 @@
                     <a class="nav-link" href="#">거래소</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">미니게임</a>
+                    <a class="nav-link" href="../gacha/gacha.jsp">Gacha</a>
                 </li>
             </ul>
         </div>
