@@ -9,12 +9,14 @@ public class invDTO {
     private int itemDef;
     private int itemAvd;
     private int itemCrit;
+    private int itemRank;
 
     //inventory
     private int invID;
     private String ID; //userID
     private int forgeLV;
     private String itemDate;
+    private int itemState;
 
 
     //get
@@ -46,6 +48,10 @@ public class invDTO {
         return this.itemCrit;
     }
 
+    public int getitemRank() {
+        return this.itemRank;
+    }
+
     //inventory
     public int getinvID() {
         return this.invID;
@@ -61,6 +67,10 @@ public class invDTO {
 
     public String getitemDate() {
         return this.itemDate;
+    }
+
+    public int getitemState() {
+        return this.itemState;
     }
 
 
@@ -93,6 +103,10 @@ public class invDTO {
         this.itemCrit = itemCrit;
     }
 
+    public void setitemRank(int itemRank) {
+        this.itemRank = itemRank;
+    }
+
     //inventory
     public void setinvID(int invID) {
         this.invID = invID;
@@ -108,5 +122,9 @@ public class invDTO {
 
     public void setitemDate(String itemDate) {
         this.itemDate = itemDate;
+    }
+
+    public void setitemState(int itemState) {
+        this.itemState = itemState;
     }
 }

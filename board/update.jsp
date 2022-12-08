@@ -93,6 +93,10 @@
             location.href = '../main/logout.jsp';
         }
 
+        function goinv() {
+            location.href = '../inventory/inventory.jsp';
+        }
+
         // 제목 내용 비었나 확인
         function checkValue() {
             var form = document.userWRITE;
@@ -171,6 +175,7 @@
                 </tbody>
             </table>
             <input class="btn btn-primary" style="float: right; font-family: 'Hanna';" type="button" value="로그아웃" onclick="logout()">
+            <input class="btn btn-primary" style="float:right; font-family: 'Hanna'" type="button" value="인벤토리" onclick="goinv()">
         </div>
     </aside>
 

@@ -74,6 +74,10 @@
         function logout() {
             location.href = '../main/logout.jsp';
         }
+
+        function goinv() {
+            location.href = '../inventory/inventory.jsp';
+        }
         
     </script>
 </head>
@@ -138,6 +142,7 @@
                 </tbody>
             </table>
             <input class="btn btn-primary" style="float: right; font-family: 'Hanna';" type="button" value="로그아웃" onclick="logout()">
+            <input class="btn btn-primary" style="float:right; font-family: 'Hanna'" type="button" value="인벤토리" onclick="goinv()">
         </div>
     </aside>
 

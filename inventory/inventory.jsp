@@ -1,6 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <% request.setCharacterEncoding("UTF-8"); %>
 
+<%@ page import="java.io.PrintWriter" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="inventory.invDAO" %>
+<%@ page import="inventory.invDTO" %>
+
 
 <!DOCTYPE html>
 <html>
@@ -9,13 +14,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/asset/css/bootstrap.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/asset/css/custom.css">
-    <title>글쓰기</title>
+    <title>게시판</title>
     <script src="${pageContext.request.contextPath}/asset/js/jquery-3.6.1.min.js"></script>
     <script src="${pageContext.request.contextPath}/asset/js/bootstrap.js"></script>
     <%
         String id = null;
         if (session.getAttribute("userID") != null) {
             id = (String) session.getAttribute("userID");
+        }
+
+        int pagenumber = 1;
+        if(request.getParameter("pageNumber") != null) {
+            pagenumber = Integer.parseInt(request.getParameter("pageNumber"));
         }
     %>
     <script>
@@ -52,7 +62,6 @@
                 })
             }
         } 
-
         
         function logout() {
             location.href = '../main/logout.jsp';
@@ -61,23 +70,14 @@
         function goinv() {
             location.href = '../inventory/inventory.jsp';
         }
-
-        // 제목 내용 비었나 확인
-        function checkValue() {
-            var form = document.userWRITE;
-
-            if(!form.boardTitle.value){
-                alert("글의 제목을 입력하세요.");
-                return false;
-            }
-
-            if(!form.boardContent.value){
-                alert("글의 내용을 입력하세요.");
-                return false;
-            }
-        }
-        
     </script>
+
+    <style type="text/css">
+        a, a:hover {
+            color: #000000;
+            text-decoration: none;
+        }
+    </style>
 </head>
 
 <body>
@@ -101,8 +101,8 @@
                 <li class="nav-item">
                     <a class="nav-link" href="../main/main.jsp">메인</a>
                 </li>
-                <li class="nav-item active">
-                    <a class="nav-link" href="../board/board.jsp" style="color:#000">게시판</a>
+                <li class="nav-item">
+                    <a class="nav-link" href="../board/board.jsp">게시판</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">거래소</a>
@@ -146,25 +146,98 @@
 
     <section>
         <div class="row">
-        <form name="userWRITE" method="post" action="../board/writeAction.jsp" onsubmit="return checkValue()">
             <table class="table table-striped" style="text-align: center; border: 1px solid #dddddd">
                 <thead>
                     <tr>
-                        <th colsapn="2" style="background-color: #6e6e6e; text-align: center;">게시판 글쓰기 양식</th>
+                        <th style="width: 75px; background-color: #6e6e6e; text-align: center">이미지</th>
+                        <th style="background-color: #6e6e6e; text-align: center;">아이템 이름</th>
+                        <th style="background-color: #6e6e6e; text-align: center;">아이템 분류</th>
+                        <th style="background-color: #6e6e6e; text-align: center;">획득일자</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td><input type="text" class="form-control" placeholder="글 제목" name="boardTitle" maxlength="50"></td>
+                    <%
+                        invDAO invDao = new invDAO();
+                        ArrayList<invDTO> list = invDao.getList(pagenumber, 0, id);
+                        if(list.size()>0) {
+                            for(int i = 0; i < list.size(); i++) {
+                    %>
+                    <tr style="width: 75px">
+                        <td style="height: 75px;"><div style="width: 75px; height: 75px"><img src='<%= list.get(i).getitemUrl() %>'></div></td>
+                    
+                    
+                        
+                        <% switch(list.get(i).getitemRank()) {
+                            case 1:
+                        %>
+                            <td style="color: #4e71e4"><a href="#"></a><%= list.get(i).getitemName() %> (<%= list.get(i).getforgeLV() %>강)</a></td>
+                        <%  break;
+                            case 2:
+                        %>
+                            <td style="color: #ad4ee4"><a href="#"></a><%= list.get(i).getitemName() %> (<%= list.get(i).getforgeLV() %>강)</a></td>
+                        <%  break;
+                            case 3:
+                        %>
+                            <td style="color: #eef109; text-shadow:1px 1px 1px #000"><a href="#"></a><%= list.get(i).getitemName() %> (<%= list.get(i).getforgeLV() %>강)</a></td>
+                        <%  break;
+                            case 4:
+                        %>
+                            <td style="color: #4ee462"><a href="#"></a><%= list.get(i).getitemName() %> (<%= list.get(i).getforgeLV() %>강)</a></td>
+                        <%  break;
+                            case 5:
+                        %>
+                            <td style="color: #fd1d1d"><a href="#"></a><%= list.get(i).getitemName() %> (<%= list.get(i).getforgeLV() %>강)</a></td>
+                        <%  break;
+                            default:
+                        %>
+                            <td><a href="#"></a><%= list.get(i).getitemName() %> (<%= list.get(i).getforgeLV() %>강)</a></td>
+                        <%  break;
+                        }
+                        %>
+                        
+                        
+                        
+                        <% if(list.get(i).getitemID() < 200) {
+                        %>
+                        <td>무기</td>
+                        <%
+                        } else {
+                        %>
+                        <td>악세서리</td>
+                        <%
+                        }
+                        %>
+                        <td><%= list.get(i).getitemDate().substring(0,11) + list.get(i).getitemDate().substring(11, 13) +"시" + list.get(i).getitemDate().substring(14,16) + "분 " + list.get(i).getitemDate().substring(17,19) + "초" %></td>
                     </tr>
+                    <%
+                        } } else {
+                    %>
+                            <tr>
+                                <td colspan="4" style="color: red">획득한 아이템이 없네요! 아이템을 얻어주세요..!</td>
+                            </tr>
+                    <%
+                        }
+                    %>
                     <tr>
-                        <td><textarea type="text" class="form-control" placeholder="글 내용" name="boardContent" maxlength="2048" style="height: 330px"></textarea></td>
+                        <td colspan="1">페이지: <%= pagenumber %></td>
+                        <td colspan="3" style="text-align: right">
+                            <%
+                                if(pagenumber !=1) {
+                            %>
+                                    <a style="width: 100px;" href="../inventory/inventory.jsp?pageNumber=<%= pagenumber - 1 %>" class="btn btn-success btn-arrow-left">이전</a>
+                            <%
+                                } if(invDao.nextPage(pagenumber + 1, 0, id)) {
+                            %>
+                                    <a style="width: 100px;" href="../inventory/inventory.jsp?pageNumber=<%= pagenumber + 1 %>" class="btn btn-success btn-arrow-left">다음</a>
+                            <%
+                                }
+                            %>
+                        </td>
+
                     </tr>
                 </tbody>
             </table>
-
-            <input type="submit" class="btn btn-primary" value="글쓰기" style="width: 100px;">
-        </form>
+            
         </div>
 
     </section>

@@ -32,11 +32,11 @@ public class gachaServlet extends HttpServlet {
         
         String result = null;
         int storage = 0;
-        storage = invDao.setinv(itemId, userId, invinfo.getitemName(), invinfo.getitemAtt(), invinfo.getitemDef(), invinfo.getitemAvd(), invinfo.getitemCrit());
+        storage = invDao.setinv(itemId, userId, invinfo.getitemName(), invinfo.getitemAtt(), invinfo.getitemDef(), invinfo.getitemAvd(), invinfo.getitemCrit(), invinfo.getitemRank());
         if(storage != -1) {
             //데이터 저장 성공
 
-            result = String.valueOf(itemId)+":"+invinfo.getitemName()+":"+invinfo.getitemUrl()+":"+String.valueOf(invinfo.getitemAtt())+":"+String.valueOf(invinfo.getitemDef())+":"+String.valueOf(invinfo.getitemAvd())+":"+String.valueOf(invinfo.getitemCrit());
+            result = String.valueOf(itemId)+":"+invinfo.getitemName()+":"+invinfo.getitemUrl()+":"+String.valueOf(invinfo.getitemAtt())+":"+String.valueOf(invinfo.getitemDef())+":"+String.valueOf(invinfo.getitemAvd())+":"+String.valueOf(invinfo.getitemCrit())+":"+String.valueOf(invinfo.getitemRank());
 
         } else {
             result = null;

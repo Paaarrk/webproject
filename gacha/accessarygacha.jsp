@@ -57,6 +57,10 @@
             location.href = '../main/logout.jsp';
         }
 
+        function goinv() {
+            location.href = '../inventory/inventory.jsp';
+        }
+
         //section함수
         function gacha() {
             var memID = '<%= id%>';
@@ -95,12 +99,24 @@
                         
                                         let data = result.split(':');
                                         console.log(data);
-                                        
+                                
                                         document.getElementById("itemName").innerHTML = data[1];
+                                        document.getElementById("itemImage").innerHTML = '<div style="width: 70px; height: 70px"><img src="'+data[2]+'"></div>'
                                         document.getElementById("itemAtt").innerHTML = data[3];
                                         document.getElementById("itemDef").innerHTML = data[4];
                                         document.getElementById("itemAvd").innerHTML = data[5];
                                         document.getElementById("itemCrit").innerHTML = data[6];
+                                        if(data[7]==1) {
+                                            document.getElementById("itemName").innerHTML = '<div style="color: #4e71e4">'+data[1]+'</div>';
+                                        } else if(data[7]==2) {
+                                            document.getElementById("itemName").innerHTML = '<div style="color: #ad4ee4">'+data[1]+'</div>';
+                                        } else if(data[7]==3) {
+                                            document.getElementById("itemName").innerHTML = '<div style="color: #eef109">'+data[1]+'</div>';
+                                        } else if(data[7]==4) {
+                                            document.getElementById("itemName").innerHTML = '<div style="color: #4ee462">'+data[1]+'</div>';
+                                        } else {
+                                            document.getElementById("itemName").innerHTML = data[1];
+                                        }
                                     },
                                     error : function() {
                                         alert("서버요청실패");
@@ -186,6 +202,7 @@
                 </tbody>
             </table>
             <input class="btn btn-primary" style="float: right; font-family: 'Hanna';" type="button" value="로그아웃" onclick="logout()">
+            <input class="btn btn-primary" style="float:right; font-family: 'Hanna'" type="button" value="인벤토리" onclick="goinv()">
         </div>
     </aside>
 
@@ -225,31 +242,35 @@
     </section1>
     <section2>
         <div style="background: #eeeeee; font-family: Hanna">획득한 아이템 정보</div>
-        <div style="background: #000000; height: 230px; color:antiquewhite">
-            <table style="border: 0px">
-                <th>
-                   <td colspan ="2" style="width: 200px; height: 20px">
+        <div style="background: #000000; height: 280px; color:antiquewhite">
+            <table style="border: 0px; width: 200px; height: 270px">
+                <tr>
+                    <td colspan = '1' style="width:80px; height: 80px">
+                        <div id="itemImage"></div>
+                    </td>
+                   <td colspan ="1" style="width: 120px; height: 80px">
                         <div id="itemName"></div>
                    </td> 
-                </th>
+                </tr>
                 <tr>
-                    <td colspan ="1" style="width: 100px; height: 50px; text-align:center">공격력</td>
+                    <td colspan ="1" style="width: 100px; height: 50px; text-align:left">공격력</td>
                     <td colspan ="1" style="width: 100px; height: 50px; text-align:left"><div id="itemAtt"></div></td>
                 </tr>
                 <tr>
-                    <td colspan ="1" style="width: 80px; height: 50px; text-align:center">방어력</td>
+                    <td colspan ="1" style="width: 80px; height: 50px; text-align:left">방어력</td>
                     <td colspan ="1" style="width: 100px; height: 50px; text-align:left"><div id="itemDef"></div></td>
                 </tr>
                 <tr>
-                    <td colspan ="1" style="width: 100px; height: 50px; text-align:center">회피율</td>
+                    <td colspan ="1" style="width: 100px; height: 50px; text-align:leftr">회피율</td>
                     <td colspan ="1" style="width: 100px; height: 50px; text-align:left"><div id="itemAvd"></div></td>
                 </tr>
                 <tr>
-                    <td colspan ="1" style="width: 100px; height: 50px; text-align:center">치명타확률</td>
+                    <td colspan ="1" style="width: 100px; height: 50px; text-align:left">치명타확률</td>
                     <td colspan ="1" style="width: 100px; height: 50px; text-align:left"><div id="itemCrit"></div></td>
                 </tr>
             </table>
         </div>
+    </section2>
     </section2>
 </div>
 </body>
