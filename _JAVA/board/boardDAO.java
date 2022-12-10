@@ -12,8 +12,8 @@ public class boardDAO {
     public boardDAO() {
         try {
             String dbURL = "jdbc:mysql://localhost:3306/webproject?useSSL=false&useUnicode=true&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&serverTimezone=UTC";
-            String dbID = 
-            String dbPassword = 
+            String dbID = "root";
+            String dbPassword = "dlsdyd11!!";
             Class.forName("com.mysql.cj.jdbc.Driver");
             conn = DriverManager.getConnection(dbURL, dbID, dbPassword);
 
@@ -24,9 +24,10 @@ public class boardDAO {
 
     public String getDate() {
         String SQL = "SELECT NOW()";
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
         try {
-            ResultSet rs = null;
-            PreparedStatement pstmt = conn.prepareStatement(SQL);
+            pstmt = conn.prepareStatement(SQL);
             rs = pstmt.executeQuery();
             if (rs.next()) {
                 return rs.getString(1);
@@ -34,7 +35,16 @@ public class boardDAO {
 
         } catch (Exception e) {
             e.printStackTrace();
-        } 
+        } finally {
+            try {
+                if(rs != null) rs.close();
+                if(pstmt != null) pstmt.close();
+            } catch (Exception e) {
+                System.out.println("정보업데이트 실패함");
+                e.printStackTrace();
+            }
+        }
+        
 
         return ""; //데이터 베이스 오류
     }
@@ -42,9 +52,10 @@ public class boardDAO {
     //다음 글 확인
     public int getNext() {
         String SQL = "SELECT boardID FROM webproject.boardinfo ORDER BY boardID DESC";
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
         try {
-            ResultSet rs = null;
-            PreparedStatement pstmt = conn.prepareStatement(SQL);
+            pstmt = conn.prepareStatement(SQL);
             rs = pstmt.executeQuery();
             if (rs.next()) {
                 return rs.getInt(1) + 1;
@@ -54,7 +65,15 @@ public class boardDAO {
 
         } catch (Exception e) {
             e.printStackTrace();
-        } 
+        } finally {
+            try {
+                if(rs != null) rs.close();
+                if(pstmt != null) pstmt.close();
+            } catch (Exception e) {
+                System.out.println("정보업데이트 실패함");
+                e.printStackTrace();
+            }
+        }
 
         return -1; //데이터 베이스 오류
     }
@@ -62,8 +81,9 @@ public class boardDAO {
     //글쓰기
     public int write(String boardTitle, String ID, String boardContent) {
         String SQL = "INSERT INTO webproject.boardinfo VALUES (?, ?, ?, ?, ?, ?, ?)";
+        PreparedStatement pstmt = null;
         try {
-            PreparedStatement pstmt = conn.prepareStatement(SQL);
+            pstmt = conn.prepareStatement(SQL);
 
             pstmt.setInt(1, getNext());
             pstmt.setString(2, boardTitle);
@@ -77,6 +97,14 @@ public class boardDAO {
 
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            try {
+                
+                if(pstmt != null) pstmt.close();
+            } catch (Exception e) {
+                System.out.println("정보업데이트 실패함");
+                e.printStackTrace();
+            }
         } 
 
         return -1; //데이터 베이스 오류
@@ -86,9 +114,10 @@ public class boardDAO {
     public ArrayList<boardDTO> getList(int pageNumber) {
         String SQL = "SELECT boardID, boardTitle, webproject.boardinfo.ID, boardDate, boardContent, boardAvailable, boardType, webproject.memberinfo.NickName FROM webproject.boardinfo LEFT JOIN webproject.memberinfo ON webproject.boardinfo.ID = webproject.memberinfo.ID WHERE boardID < ? AND boardAvailable = 1 ORDER BY boardID DESC LIMIT 10";
         ArrayList<boardDTO> list = new ArrayList<boardDTO>();
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
         try {
-            ResultSet rs = null;
-            PreparedStatement pstmt = conn.prepareStatement(SQL);
+            pstmt = conn.prepareStatement(SQL);
             pstmt.setInt(1, getNext() - (pageNumber - 1) * 10);
             rs = pstmt.executeQuery();
             while (rs.next()) {
@@ -108,7 +137,15 @@ public class boardDAO {
             }
         } catch (Exception e) {
             e.printStackTrace();
-        } 
+        } finally {
+            try {
+                if(rs != null) rs.close();
+                if(pstmt != null) pstmt.close();
+            } catch (Exception e) {
+                System.out.println("정보업데이트 실패함");
+                e.printStackTrace();
+            }
+        }
         
         return list; 
     }
@@ -116,9 +153,10 @@ public class boardDAO {
     // 페이징 처리 (10단위로 끊길때 다음페이지 버튼이 생기지 않도록)
     public boolean nextPage(int pageNumber) {
         String SQL = "SELECT * FROM webproject.boardinfo WHERE boardID < ? AND boardAvailable = 1 ORDER BY boardID DESC LIMIT 10";
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
         try {
-            ResultSet rs = null;
-            PreparedStatement pstmt = conn.prepareStatement(SQL);
+            pstmt = conn.prepareStatement(SQL);
             pstmt.setInt(1, getNext() - (pageNumber - 1) * 10);
             rs = pstmt.executeQuery();
             if (rs.next()) {
@@ -126,6 +164,14 @@ public class boardDAO {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            try {
+                if(rs != null) rs.close();
+                if(pstmt != null) pstmt.close();
+            } catch (Exception e) {
+                System.out.println("정보업데이트 실패함");
+                e.printStackTrace();
+            }
         } 
         
         return false;
@@ -134,9 +180,10 @@ public class boardDAO {
     //게시글 보기
     public boardDTO getboardDTO(int boardID) {
         String SQL = "SELECT boardID, boardTitle, webproject.boardinfo.ID, boardDate, boardContent, boardAvailable, boardType, webproject.memberinfo.NickName FROM webproject.boardinfo LEFT JOIN webproject.memberinfo ON webproject.boardinfo.ID = webproject.memberinfo.ID WHERE boardID = ?  ";
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
         try {
-            ResultSet rs = null;
-            PreparedStatement pstmt = conn.prepareStatement(SQL);
+            pstmt = conn.prepareStatement(SQL);
             pstmt.setInt(1, boardID);
             rs = pstmt.executeQuery();
             if (rs.next()) {
@@ -156,7 +203,15 @@ public class boardDAO {
             }
         } catch (Exception e) {
             e.printStackTrace();
-        } 
+        } finally {
+            try {
+                if(rs != null) rs.close();
+                if(pstmt != null) pstmt.close();
+            } catch (Exception e) {
+                System.out.println("정보업데이트 실패함");
+                e.printStackTrace();
+            }
+        }
         
         return null; //해당 글이 존재하지 않습니다
     }
@@ -164,8 +219,9 @@ public class boardDAO {
     //게시글 수정
     public int update(int boardID, String boardTitle, String boardContent) {
         String SQL = "UPDATE webproject.boardinfo SET boardTitle = ?, boardContent = ? WHERE boardID = ?";
+        PreparedStatement pstmt = null;
         try {
-            PreparedStatement pstmt = conn.prepareStatement(SQL);
+            pstmt = conn.prepareStatement(SQL);
 
             pstmt.setString(1, boardTitle);
             pstmt.setString(2, boardContent);
@@ -175,15 +231,24 @@ public class boardDAO {
 
         } catch (Exception e) {
             e.printStackTrace();
-        } 
+        } finally {
+            try {
+                
+                if(pstmt != null) pstmt.close();
+            } catch (Exception e) {
+                System.out.println("정보업데이트 실패함");
+                e.printStackTrace();
+            }
+        }
 
         return -1; //데이터 베이스 오류
     }
 
     public int delete(int boardID) {
         String SQL = "UPDATE webproject.boardinfo SET boardAvailable = 0 WHERE boardID = ?";
+        PreparedStatement pstmt = null;
         try {
-            PreparedStatement pstmt = conn.prepareStatement(SQL);
+            pstmt = conn.prepareStatement(SQL);
 
             pstmt.setInt(1, boardID);
             
@@ -191,7 +256,15 @@ public class boardDAO {
 
         } catch (Exception e) {
             e.printStackTrace();
-        } 
+        } finally {
+            try {
+                
+                if(pstmt != null) pstmt.close();
+            } catch (Exception e) {
+                System.out.println("정보업데이트 실패함");
+                e.printStackTrace();
+            }
+        }
         return -1; //데이터베이스 오류
     }
 

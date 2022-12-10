@@ -168,7 +168,7 @@ function gacha() {
                     <a class="nav-link" href="../board/board.jsp">게시판</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">거래소</a>
+                    <a class="nav-link" href="../inventory/trademarket.jsp">거래소</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="../gacha/gacha.jsp" style="color:#000">Gacha</a>
@@ -243,7 +243,7 @@ function gacha() {
         <div style="font-size: 15px">이 외의 자세한 정보는 뽑으면서 알아가요!</div>
         <input class="btn btn-primary" style="float: right; width: 80px" type="button" onclick="gacha()" value="1회뽑기">
     </section1>
-    <section2>
+    <section3>
         <div style="background: #eeeeee; font-family: Hanna">획득한 아이템 정보</div>
         <div style="background: #000000; height: 280px; color:antiquewhite">
             <table style="border: 0px; width: 200px; height: 270px">
@@ -273,7 +273,7 @@ function gacha() {
                 </tr>
             </table>
         </div>
-    </section2>
+    </section3>
 </div>
 </body>
 </html>

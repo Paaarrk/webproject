@@ -1,9 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <% request.setCharacterEncoding("UTF-8"); %>
 
-<%@ page import="board.boardDTO" %>
-<%@ page import="board.boardDAO" %>
 <%@ page import="java.io.PrintWriter" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="inventory.invDAO" %>
+<%@ page import="inventory.invDTO" %>
 
 
 <!DOCTYPE html>
@@ -13,7 +14,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/asset/css/bootstrap.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/asset/css/custom.css">
-    <title>글쓰기</title>
+    <title>놀이터</title>
     <script src="${pageContext.request.contextPath}/asset/js/jquery-3.6.1.min.js"></script>
     <script src="${pageContext.request.contextPath}/asset/js/bootstrap.js"></script>
     <%
@@ -22,18 +23,10 @@
             id = (String) session.getAttribute("userID");
         }
 
-        int boardid = 0;
-        if (request.getParameter("boardID") != null) {
-            boardid = Integer.parseInt(request.getParameter("boardID"));
+        int pagenumber = 1;
+        if(request.getParameter("pageNumber") != null) {
+            pagenumber = Integer.parseInt(request.getParameter("pageNumber"));
         }
-        if (boardid == 0) {
-            PrintWriter script = response.getWriter();
-            script.println("<script>");
-            script.println("alert('유효하지 않은 게시물입니다.')");
-            script.println("location.href = '../board/board.jsp'");
-            script.println("</script>");
-        } 
-        boardDTO boardDto = new boardDAO().getboardDTO(boardid);
     %>
     <script>
         
@@ -69,7 +62,6 @@
                 })
             }
         } 
-
         
         function logout() {
             location.href = '../main/logout.jsp';
@@ -78,8 +70,17 @@
         function goinv() {
             location.href = '../inventory/inventory.jsp';
         }
+
+        //section 함수
         
     </script>
+
+    <style type="text/css">
+        a, a:hover {
+            color: #000000;
+            text-decoration: none;
+        }
+    </style>
 </head>
 
 <body>
@@ -103,11 +104,11 @@
                 <li class="nav-item">
                     <a class="nav-link" href="../main/main.jsp">메인</a>
                 </li>
-                <li class="nav-item active">
-                    <a class="nav-link" href="../board/board.jsp" style="color:#000">게시판</a>
+                <li class="nav-item">
+                    <a class="nav-link" href="../board/board.jsp">게시판</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="../inventory/trademarket.jsp">거래소</a>
+                    <a class="nav-link" href="../inventory/trademarket.jsp" style="color:#000">거래소</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="../gacha/gacha.jsp">Gacha</a>
@@ -151,37 +152,96 @@
             <table class="table table-striped" style="text-align: center; border: 1px solid #dddddd">
                 <thead>
                     <tr>
-                        <th colspan="3" style="background-color: #6e6e6e; text-align: center;">게시글 보기</th>
+                        <th style="width: 75px; background-color: #6e6e6e; text-align: center">이미지</th>
+                        <th style="background-color: #6e6e6e; text-align: center; width: 150px">아이템 이름</th>
+                        <th style="background-color: #6e6e6e; text-align: center; width: 100px">아이템 분류</th>
+                        <th style="background-color: #6e6e6e; text-align: center; width: 150px">가격</th>
+                        <th style="background-color: #6e6e6e; text-align: center;">자세히 보기</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td style="width: 20%;">게시글 제목</td>
-                        <td colspan="2"><%= boardDto.getboardTitle().replaceAll(" ", "&nbsp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\n", "<br>") %></td>
+                    <%
+                        invDAO invDao = new invDAO();
+                        ArrayList<invDTO> list = invDao.gettradeList(pagenumber, 1);
+                        if(list.size()>0) {
+                            for(int i = 0; i < list.size(); i++) {
+                    %>
+                    <tr style="width: 75px">
+                        <td style="height: 75px;"><div style="width: 75px; height: 75px"><img src='<%= list.get(i).getitemUrl() %>'></div></td>
+                    
+                    
+                        
+                        <% switch(list.get(i).getitemRank()) {
+                            case 1:
+                        %>
+                            <td style="color: #4e71e4"><a href="#"></a><%= list.get(i).getitemName() %> (<%= list.get(i).getforgeLV() %>강)</a></td>
+                        <%  break;
+                            case 2:
+                        %>
+                            <td style="color: #ad4ee4"><a href="#"></a><%= list.get(i).getitemName() %> (<%= list.get(i).getforgeLV() %>강)</a></td>
+                        <%  break;
+                            case 3:
+                        %>
+                            <td style="color: #eef109; text-shadow:1px 1px 1px #000"><a href="#"></a><%= list.get(i).getitemName() %> (<%= list.get(i).getforgeLV() %>강)</a></td>
+                        <%  break;
+                            case 4:
+                        %>
+                            <td style="color: #4ee462"><a href="#"></a><%= list.get(i).getitemName() %> (<%= list.get(i).getforgeLV() %>강)</a></td>
+                        <%  break;
+                            case 5:
+                        %>
+                            <td style="color: #fd1d1d"><a href="#"></a><%= list.get(i).getitemName() %> (<%= list.get(i).getforgeLV() %>강)</a></td>
+                        <%  break;
+                            default:
+                        %>
+                            <td><a href="#"></a><%= list.get(i).getitemName() %> (<%= list.get(i).getforgeLV() %>강)</a></td>
+                        <%  break;
+                        }
+                        %>
+                        
+                        
+                        
+                        <% if(list.get(i).getitemID() < 200) {
+                        %>
+                        <td>무기</td>
+                        <%
+                        } else {
+                        %>
+                        <td>악세서리</td>
+                        <%
+                        }
+                        %>
+                        <td style="width: 150px; height: 95px; float: right"><%= list.get(i).getitemPrice() %> 코인</td>
+                        <td><a href="../inventory/viewTradeitem.jsp?invID=<%= list.get(i).getinvID() %>">☞ 성능 확인하기</a></td>
                     </tr>
+                    <%
+                        } } else {
+                    %>
+                            <tr>
+                                <td colspan="4" style="color: red">거래소에 올라온 아이템이 없어요..!</td>
+                            </tr>
+                    <%
+                        }
+                    %>
                     <tr>
-                        <td>작성자</td>
-                        <td colspan="2"><%= boardDto.getNickname() %></td>
-                    </tr>
-                    <tr>
-                        <td>작성일자</td>
-                        <td colspan="2"><%= boardDto.getboardDate().substring(0,11) + boardDto.getboardDate().substring(11, 13) +"시" + boardDto.getboardDate().substring(14,16) + "분 " + boardDto.getboardDate().substring(17,19) + "초" %></td>
-                    </tr>
-                    <tr>
-                        <td>내용</td>
-                        <td colspan="2" style="min-height: 200px; text-align: left;"><%= boardDto.getboardContent().replaceAll(" ", "&nbsp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\n", "<br>") %></td>
+                        <td colspan="1">페이지: <%= pagenumber %></td>
+                        <td colspan="4" style="text-align: right">
+                            <%
+                                if(pagenumber !=1) {
+                            %>
+                                    <a style="width: 100px;" href="../inventory/trademarket.jsp?pageNumber=<%= pagenumber - 1 %>" class="btn btn-success btn-arrow-left">이전</a>
+                            <%
+                                } if(invDao.nextPage(pagenumber + 1, 1)) {
+                            %>
+                                    <a style="width: 100px;" href="../inventory/trademarket.jsp?pageNumber=<%= pagenumber + 1 %>" class="btn btn-success btn-arrow-left">다음</a>
+                            <%
+                                }
+                            %>
+                        </td>
+
                     </tr>
                 </tbody>
             </table>
-            <a href="../board/board.jsp" class="btn btn-primary" style="width: 80px">목록</a>
-            <%
-                if(id != null && id.equals(boardDto.getID())) {
-            %>
-                    <a href = "../board/update.jsp?boardID=<%= boardid %>" class="btn btn-primary" style="width: 80px">수정</a>
-                    <a href = "../board/deleteAction.jsp?boardID=<%= boardid %>" class="btn btn-primary" style="width: 80px">삭제</a>
-            <%
-                }
-            %>
             
         </div>
 

@@ -78,6 +78,20 @@ aside {
     background: #f0efef;
 }
 
+/* 인벤토리 강화정보추가 */
+.pic {
+   position: relative; 
+}
+.forge {
+    position: absolute;
+
+    bottom: 0%;
+    right: 5%;
+}
+
+
+
+/* 섹션 */
 section {
     width: 600px;
     float: left;
@@ -91,4 +105,19 @@ section1 {
 section2 {
     width: 200px;
     float: right;
+}
+
+section3 {
+    width: 165px;
+    float: right;
+}
+
+section4 {
+    width: 240px;
+    float: left;
+}
+
+section5 {
+    width: 360px;
+    float: left;
 }

@@ -13,7 +13,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html"; charset="UTF-8">
-    <title>보낸다</title>
+    <title>강화</title>
 </head>
 <body>
     <%

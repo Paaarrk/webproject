@@ -166,7 +166,7 @@
                     <a class="nav-link" href="../board/board.jsp">게시판</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">거래소</a>
+                    <a class="nav-link" href="../inventory/trademarket.jsp">거래소</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="../gacha/gacha.jsp" style="color:#000">Gacha</a>

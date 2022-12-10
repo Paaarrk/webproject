@@ -1,9 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <% request.setCharacterEncoding("UTF-8"); %>
 
-<%@ page import="board.boardDTO" %>
-<%@ page import="board.boardDAO" %>
 <%@ page import="java.io.PrintWriter" %>
+<%@ page import="inventory.invDAO" %>
+<%@ page import="inventory.invDTO" %>
 
 
 <!DOCTYPE html>
@@ -13,7 +13,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/asset/css/bootstrap.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/asset/css/custom.css">
-    <title>글쓰기</title>
+    <title>놀이터</title>
     <script src="${pageContext.request.contextPath}/asset/js/jquery-3.6.1.min.js"></script>
     <script src="${pageContext.request.contextPath}/asset/js/bootstrap.js"></script>
     <%
@@ -22,18 +22,35 @@
             id = (String) session.getAttribute("userID");
         }
 
-        int boardid = 0;
-        if (request.getParameter("boardID") != null) {
-            boardid = Integer.parseInt(request.getParameter("boardID"));
+        int invid = 0;
+        if (request.getParameter("invID") != null) {
+            invid = Integer.parseInt(request.getParameter("invID"));
         }
-        if (boardid == 0) {
+        if (invid == 0) {
             PrintWriter script = response.getWriter();
             script.println("<script>");
-            script.println("alert('유효하지 않은 게시물입니다.')");
-            script.println("location.href = '../board/board.jsp'");
+            script.println("alert('접근 불가능한 아이템 입니다')");
+            script.println("location.href = '../inventory/inventory.jsp'");
             script.println("</script>");
         } 
-        boardDTO boardDto = new boardDAO().getboardDTO(boardid);
+        invDTO invDto = new invDAO().getinvDTO(invid, id);
+
+        if(invDto.getitemID() == 0) {
+            PrintWriter script = response.getWriter();
+            script.println("<script>");
+            script.println("alert('접근 불가능한 아이템 입니다')");
+            script.println("location.href = '../inventory/inventory.jsp'");
+            script.println("</script>");
+        }
+        /* 삭제됫거나, 이미 거래소에 올라가 있는 경우*/
+        if((invDto.getitemState() == 2) || (invDto.getitemState() == 1)) {
+            PrintWriter script = response.getWriter();
+            script.println("<script>");
+            script.println("alert('접근 불가능한 아이템 입니다')");
+            script.println("location.href = '../inventory/inventory.jsp'");
+            script.println("</script>");
+        }
+        
     %>
     <script>
         
@@ -69,7 +86,6 @@
                 })
             }
         } 
-
         
         function logout() {
             location.href = '../main/logout.jsp';
@@ -78,8 +94,21 @@
         function goinv() {
             location.href = '../inventory/inventory.jsp';
         }
-        
+
+        //section함수
+        function goinfo() {
+            location.href = '../inventory/viewitem.jsp?invID=<%= invid %>'
+        }
     </script>
+
+    
+
+    <style type="text/css">
+        a, a:hover {
+            color: #000000;
+            text-decoration: none;
+        }
+    </style>
 </head>
 
 <body>
@@ -103,8 +132,8 @@
                 <li class="nav-item">
                     <a class="nav-link" href="../main/main.jsp">메인</a>
                 </li>
-                <li class="nav-item active">
-                    <a class="nav-link" href="../board/board.jsp" style="color:#000">게시판</a>
+                <li class="nav-item">
+                    <a class="nav-link" href="../board/board.jsp">게시판</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="../inventory/trademarket.jsp">거래소</a>
@@ -146,46 +175,82 @@
         </div>
     </aside>
 
-    <section>
-        <div class="row">
-            <table class="table table-striped" style="text-align: center; border: 1px solid #dddddd">
-                <thead>
-                    <tr>
-                        <th colspan="3" style="background-color: #6e6e6e; text-align: center;">게시글 보기</th>
-                    </tr>
-                </thead>
+    
+    <section4>
+        <div style="background: #eeeeee; font-family: Hanna; height: 43px; text-align: center; border:#000 solid; font-size: 25px;">아이템 정보</div>
+        <div style="background: #000000; height: 300px; color:antiquewhite">
+            <table style="border: 0px; width: 200px; height: 300px">
+                <tr>
+                    <td colspan = '1' style="width:75px; height: 75px"><div id="itemImage"><img src='<%= invDto.getitemUrl() %>'></div></td>
+                    <td><div id="itemName">
+                        <% if(invDto.getitemRank() == 1) { %> 
+                            <div style="color: #4e71e4"><%= invDto.getitemName() %> (<%= invDto.getforgeLV() %>강)</div>
+                        <% } else if (invDto.getitemRank() == 2) { %>
+                            <div style="color: #ad4ee4"><%= invDto.getitemName() %> (<%= invDto.getforgeLV() %>강)</div>
+                        <% } else if (invDto.getitemRank() == 3) { %>
+                            <div style="color: #eef109"><%= invDto.getitemName() %> (<%= invDto.getforgeLV() %>강)</div>
+                        <% } else if (invDto.getitemRank() == 4) { %>
+                            <div style="color: #4ee462"><%= invDto.getitemName() %> (<%= invDto.getforgeLV() %>강)</div>
+                        <% } else if (invDto.getitemRank() == 5) { %>
+                            <div style="color: #fd1d1d"><%= invDto.getitemName() %> (<%= invDto.getforgeLV() %>강)</div>
+                        <% } else { %>
+                            <div style="color: #ffffff"><%= invDto.getitemName() %> (<%= invDto.getforgeLV() %>강)</div>
+                        <% } %>
+                    </div></td>
+                </tr>
+                <tr>
+                    <td colspan ="1" style="width: 80px; height: 30px; text-align:left">공격력</td>
+                    <td colspan ="1" style="width: 80px; height: 30px; text-align:left"><div id="itemAtt"><%= invDto.getitemAtt() %></div></td>
+                </tr>
+                <tr>
+                    <td colspan ="1" style="width: 80px; height: 30px; text-align:left">방어력</td>
+                    <td colspan ="1" style="width: 80px; height: 30px; text-align:left"><div id="itemDef"><%= invDto.getitemDef() %></div></td>
+                </tr>
+                <tr>
+                    <td colspan ="1" style="width: 80px; height: 30px; text-align:leftr">회피율</td>
+                    <td colspan ="1" style="width: 100px; height: 30px; text-align:left"><div id="itemAvd"><%= invDto.getitemAvd() %></div></td>
+                </tr>
+                <tr>
+                    <td colspan ="1" style="width: 80px; height: 30px; text-align:left">치명타확률</td>
+                    <td colspan ="1" style="width: 100px; height: 30px; text-align:left"><div id="itemCrit"><%= invDto.getitemCrit() %></div></td>
+                </tr>
+                <tr>
+                    <td colspan ="1" style="width: 80px; height: 30px; text-align:left">종류</td>
+                    <td colspan ="1" style="width: 100px; height: 30px; text-align:left"><div id="itemType">
+                        <% if (invDto.getitemID() < 200) { %>
+                            무기
+                        <% } else { %>
+                            악세서리
+                        <% } %>     
+                    </div></td>
+                </tr>
+            </table>
+        </div>   
+    </section4>
+
+    <section5>
+        <form name="tradeon" method="post" action="../tradeon">
+            <table class="table table-striped" style="text-align: center; border: 3px solid #000000; width: 360px;">
                 <tbody>
+                    
                     <tr>
-                        <td style="width: 20%;">게시글 제목</td>
-                        <td colspan="2"><%= boardDto.getboardTitle().replaceAll(" ", "&nbsp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\n", "<br>") %></td>
+                        <td colspan="2">거래소에 올리기</td>
                     </tr>
                     <tr>
-                        <td>작성자</td>
-                        <td colspan="2"><%= boardDto.getNickname() %></td>
+                        <td style="width: 30%">판매가격</td><td><input class="form-control" type="text" name="price" id="price" placeholder="숫자만 입력, 10자리 이내" maxlength="10"></td>
                     </tr>
-                    <tr>
-                        <td>작성일자</td>
-                        <td colspan="2"><%= boardDto.getboardDate().substring(0,11) + boardDto.getboardDate().substring(11, 13) +"시" + boardDto.getboardDate().substring(14,16) + "분 " + boardDto.getboardDate().substring(17,19) + "초" %></td>
+                    <tr>   
+                        <td colspan="2"><input class="btn btn-primary" style="float: left; font-family: 'Hanna';" type="button" value="뒤로가기" onclick="goinfo()"><input class="btn btn-primary" style="float: right; font-family: 'Hanna';" type="submit" value="판매하기"></td>
                     </tr>
-                    <tr>
-                        <td>내용</td>
-                        <td colspan="2" style="min-height: 200px; text-align: left;"><%= boardDto.getboardContent().replaceAll(" ", "&nbsp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\n", "<br>") %></td>
-                    </tr>
+                    
                 </tbody>
             </table>
-            <a href="../board/board.jsp" class="btn btn-primary" style="width: 80px">목록</a>
-            <%
-                if(id != null && id.equals(boardDto.getID())) {
-            %>
-                    <a href = "../board/update.jsp?boardID=<%= boardid %>" class="btn btn-primary" style="width: 80px">수정</a>
-                    <a href = "../board/deleteAction.jsp?boardID=<%= boardid %>" class="btn btn-primary" style="width: 80px">삭제</a>
-            <%
-                }
-            %>
-            
-        </div>
-
-    </section>
+            <input type="hidden" name="invid" value="<%= invid %>">
+            <input type="hidden" name="id" value="<%= id %>">
+        </form>
+    </section5>
+    
+    
     
 </div>
 </body>

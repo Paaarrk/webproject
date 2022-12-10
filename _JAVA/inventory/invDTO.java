@@ -18,6 +18,9 @@ public class invDTO {
     private String itemDate;
     private int itemState;
 
+    //trade
+    private int itemPrice;
+
 
     //get
     public int getitemID() {
@@ -73,6 +76,11 @@ public class invDTO {
         return this.itemState;
     }
 
+    //price
+    public int getitemPrice() {
+        return this.itemPrice;
+    }
+
 
     //set
     public void setitemID(int itemID) {
@@ -126,5 +134,10 @@ public class invDTO {
 
     public void setitemState(int itemState) {
         this.itemState = itemState;
+    }
+
+    //trade
+    public void setitemPrice(int itemPrice) {
+        this.itemPrice = itemPrice;
     }
 }

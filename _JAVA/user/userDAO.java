@@ -12,8 +12,8 @@ public class userDAO {
     public userDAO() {
         try {
             String dbURL = "jdbc:mysql://localhost:3306/webproject?useSSL=false&useUnicode=true&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&serverTimezone=UTC";
-            String dbID = 
-            String dbPassword = 
+            String dbID = "root";
+            String dbPassword = "dlsdyd11!!";
             Class.forName("com.mysql.cj.jdbc.Driver");
             conn = DriverManager.getConnection(dbURL, dbID, dbPassword);
 
@@ -125,6 +125,14 @@ public class userDAO {
         
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            try {
+                
+                if(pstmt != null) pstmt.close();
+            } catch (Exception e) {
+                System.out.println("정보업데이트 실패함");
+                e.printStackTrace();
+            }
         }
         return -1; //데이터베이스 오류
     }
