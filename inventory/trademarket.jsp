@@ -71,6 +71,10 @@
             location.href = '../inventory/inventory.jsp';
         }
 
+        function levelup() {
+            location.href = '../rank/levelup.jsp';
+        }
+
         //section 함수
         
     </script>
@@ -142,6 +146,7 @@
                     </tr>
                 </tbody>
             </table>
+            <input class="btn btn-primary" style="float: left; font-family: 'Hanna';" type="button" value="레벨업" onclick="levelup()">
             <input class="btn btn-primary" style="float: right; font-family: 'Hanna';" type="button" value="로그아웃" onclick="logout()">
             <input class="btn btn-primary" style="float:right; font-family: 'Hanna'" type="button" value="인벤토리" onclick="goinv()">
         </div>
@@ -218,7 +223,7 @@
                         } } else {
                     %>
                             <tr>
-                                <td colspan="4" style="color: red">거래소에 올라온 아이템이 없어요..!</td>
+                                <td colspan="5" style="color: red">거래소에 올라온 아이템이 없어요..!</td>
                             </tr>
                     <%
                         }

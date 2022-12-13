@@ -35,7 +35,7 @@
         } 
         invDTO invDto = new invDAO().getinvDTO(invid, id);
 
-        if(invDto.getitemID() == 0) {
+        if(invDto == null) {
             PrintWriter script = response.getWriter();
             script.println("<script>");
             script.println("alert('접근 불가능한 아이템 입니다')");
@@ -43,7 +43,7 @@
             script.println("</script>");
         }
 
-        if(invDto.getitemState() == 2) {
+        if(invDto.getitemState() == 2 || invDto.getitemState() == 1) {
             PrintWriter script = response.getWriter();
             script.println("<script>");
             script.println("alert('접근 불가능한 아이템 입니다')");
@@ -93,6 +93,10 @@
 
         function goinv() {
             location.href = '../inventory/inventory.jsp';
+        }
+
+        function levelup() {
+            location.href = '../rank/levelup.jsp';
         }
 
         //section함수
@@ -172,6 +176,7 @@
                     </tr>
                 </tbody>
             </table>
+            <input class="btn btn-primary" style="float: left; font-family: 'Hanna';" type="button" value="레벨업" onclick="levelup()">
             <input class="btn btn-primary" style="float: right; font-family: 'Hanna';" type="button" value="로그아웃" onclick="logout()">
             <input class="btn btn-primary" style="float:right; font-family: 'Hanna'" type="button" value="인벤토리" onclick="goinv()">
         </div>

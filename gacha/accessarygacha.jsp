@@ -9,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/asset/css/bootstrap.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/asset/css/custom.css">
-    <title>메인 페이지</title>
+    <title>놀이터</title>
     <script src="${pageContext.request.contextPath}/asset/js/jquery-3.6.1.min.js"></script>
     <script src="${pageContext.request.contextPath}/asset/js/bootstrap.js"></script>
     <%
@@ -59,6 +59,10 @@
 
         function goinv() {
             location.href = '../inventory/inventory.jsp';
+        }
+
+        function levelup() {
+            location.href = '../rank/levelup.jsp';
         }
 
         //section함수
@@ -201,6 +205,7 @@
                     </tr>
                 </tbody>
             </table>
+            <input class="btn btn-primary" style="float: left; font-family: 'Hanna';" type="button" value="레벨업" onclick="levelup()">
             <input class="btn btn-primary" style="float: right; font-family: 'Hanna';" type="button" value="로그아웃" onclick="logout()">
             <input class="btn btn-primary" style="float:right; font-family: 'Hanna'" type="button" value="인벤토리" onclick="goinv()">
         </div>

@@ -1,12 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <% request.setCharacterEncoding("UTF-8"); %>
 
-<%@ page import="java.io.PrintWriter" %>
-<%@ page import="java.util.ArrayList" %>
-<%@ page import="java.util.List"%>
-<%@ page import="inventory.invDAO" %>
-<%@ page import="inventory.invDTO" %>
-
 
 <!DOCTYPE html>
 <html>
@@ -23,7 +17,6 @@
         if (session.getAttribute("userID") != null) {
             id = (String) session.getAttribute("userID");
         }
-         
     %>
     <script>
         
@@ -71,21 +64,7 @@
         function levelup() {
             location.href = '../rank/levelup.jsp';
         }
-
-        //section함수
-        
-        
-
     </script>
-
-    
-
-    <style type="text/css">
-        a, a:hover {
-            color: #000000;
-            text-decoration: none;
-        }
-    </style>
 </head>
 
 <body>
@@ -106,7 +85,7 @@
 
         <div class="collapse navbar-collapse" id="header_nav">
             <ul class="nav navbar-nav mr-auto">
-                <li class="nav-item">
+                <li class="nav-item active">
                     <a class="nav-link" href="../main/main.jsp">메인</a>
                 </li>
                 <li class="nav-item">
@@ -121,6 +100,7 @@
             </ul>
         </div>
     </nav>
+    
     
     <aside>
         <div id="information" style="width: 400px; height:200px">
@@ -154,66 +134,32 @@
     </aside>
 
     <section>
-                <%
-                invDAO invDao = new invDAO();
-                ArrayList<invDTO> list = invDao.getList(0, id);
-                %>
-        <div  style="width: 600px" class="inventory">
-            <div style="background-color: #6e6e6e; text-align: center">아이템 목록 (아이템 수: <%= list.size() %>)</div>
-            <div style="background-color: #6e6e6e; text-align: left; color: yellow">아이템 정보는 이미지 클릭!!</div>
-            <div style="background-color: #6e6e6e; text-align: right; color: yellow"><a href="../inventory/selling.jsp">판매중인 아이템 보러가기 </a></div>
-                <%  
-                
-                if( list.size() != 0 ) {
-                    for( int i = 0; i < list.size(); i++) {
-
-                        if(list.get(i).getinvID() != 0) { %>
-                            <div class="pic" style="width: 75px; height: 75px; float: left; border: 1px #000000 solid"><a href="../inventory/viewitem.jsp?invID=<%= list.get(i).getinvID() %>"><img style="width:74px; height:74px" src='<%= list.get(i).getitemUrl() %>'><span class="forge" style="text-shadow: -1px 0 #000, 0 1px #000, 1px 0 #000, 0 -1px #000; color: yellow"><%= list.get(i).getforgeLV() %></span></a></div>
-                <%      } else { %>
-                            <div><img src='../asset/img/null.jpg'></div>
-                <%      } %>                
-                <%
-                    }} else {
-                %>
-                        <div style="color: red">획득한 아이템이 없네요! 아이템을 얻어주세요..!</div>
-                <%
-                    }
-                %>
-        </div>  
-        
-    </section>    
-        
-<!--
-    <section3>
-        <div style="background: #eeeeee; font-family: Hanna; height: 43px; text-align: center; border:#000 solid; font-size: 25px;">아이템 정보</div>
-        <div style="background: #000000; height: 260px; color:antiquewhite">
-            <table style="border: 0px; width: 200px; height: 270px">
+        <form name="userlevelup" method="post" action="../levelup">
+        <table class="table table-bordered table-hover" style="margin-top: 0%">
+            <thead>
                 <tr>
-                   <td colspan ="2" style="height: 30px">
-                        <div id="itemName"></div>
-                   </td> 
+                    <td colspan="3">요구 경험치 표</td>
+                    <td colspan="1">요구 경험치량</td>
                 </tr>
+            </thead>
+            <tbody>
+                <% for(int i = 1; i < 10; i++) { %>
                 <tr>
-                    <td colspan ="1" style="width: 80px; height: 30px; text-align:left">공격력</td>
-                    <td colspan ="1" style="width: 80px; height: 30px; text-align:left"><div id="itemAtt"></div></td>
+                    <td style="width: 20%; text-align: center">Lv<%= i %></td>
+                    <td style="width: 10%; text-align: center">▷</td>
+                    <td style="width: 20%; text-align: center">Lv<%= i+1 %></td>
+                    <td>필요 경험치: <%= i*i*200 + 500 %></td>
                 </tr>
-                <tr>
-                    <td colspan ="1" style="width: 80px; height: 30px; text-align:left">방어력</td>
-                    <td colspan ="1" style="width: 80px; height: 30px; text-align:left"><div id="itemDef"></div></td>
+                <% } %>
+                <tr style="background: #dddddd">
+                    <td colspan="3" style="text-align: right; color: #ee0a0a">10 이후는 필요경험치 20000</td>
+                    <td colspan="1"><input type="submit" class="btn btn-primary" value="레벨업!!" style="float: right"></td>
                 </tr>
-                <tr>
-                    <td colspan ="1" style="width: 80px; height: 30px; text-align:leftr">회피율</td>
-                    <td colspan ="1" style="width: 100px; height: 30px; text-align:left"><div id="itemAvd"></div></td>
-                </tr>
-                <tr>
-                    <td colspan ="1" style="width: 80px; height: 30px; text-align:left">치명타확률</td>
-                    <td colspan ="1" style="width: 100px; height: 30px; text-align:left"><div id="itemCrit"></div></td>
-                </tr>
-            </table>
-        </div>
-    </section3>
--->
-    
+            </tbody>
+        </table>
+        <input type="hidden" name="id" value="<%= id %>">
+        </form>
+    </section>
 </div>
 </body>
 </html>

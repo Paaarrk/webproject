@@ -1,5 +1,12 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <% request.setCharacterEncoding("UTF-8"); %>
+<%@ page import="user.ranklvDAO" %>
+<%@ page import="user.ranklvDTO" %>
+<%@ page import="user.battleinfoDTO" %>
+<%@ page import="user.battleinfoDAO" %>
+<%@ page import="java.util.Collections" %>
+<%@ page import="java.util.ArrayList" %>
+
 
 
 <!DOCTYPE html>
@@ -9,7 +16,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/asset/css/bootstrap.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/asset/css/custom.css">
-    <title>메인 페이지</title>
+    <title>놀이터</title>
     <script src="${pageContext.request.contextPath}/asset/js/jquery-3.6.1.min.js"></script>
     <script src="${pageContext.request.contextPath}/asset/js/bootstrap.js"></script>
     <%
@@ -59,6 +66,10 @@
 
         function goinv() {
             location.href = '../inventory/inventory.jsp';
+        }
+
+        function levelup() {
+            location.href = '../rank/levelup.jsp';
         }
     </script>
 </head>
@@ -123,14 +134,149 @@
                     </tr>
                 </tbody>
             </table>
+            <input class="btn btn-primary" style="float: left; font-family: 'Hanna';" type="button" value="레벨업" onclick="levelup()">
             <input class="btn btn-primary" style="float: right; font-family: 'Hanna';" type="button" value="로그아웃" onclick="logout()">
             <input class="btn btn-primary" style="float:right; font-family: 'Hanna'" type="button" value="인벤토리" onclick="goinv()">
         </div>
     </aside>
 
-    <section>
-        
-    </section>
+    <section_m1>
+        <table class="table table-bordered table-hover" style="background: #f3f3f3">
+            <%
+                battleinfoDAO battleinfoDao = new battleinfoDAO();
+                ArrayList<battleinfoDTO> list = battleinfoDao.getList();
+
+                
+                String[] nickname = new String[3];
+                int[] power = new int[3];
+                
+                if(list.size() < 3)
+                {
+                    for(int i=0; i < list.size(); i++)
+                    {
+                        nickname[i] = list.get(i).getNickname();
+                        power[i] = list.get(i).getPower();
+                    }
+                
+                    for(int j=list.size(); j < 3; j++)
+                    {
+                        nickname[j] = "없음";
+                        power[j] = 0;
+                    }
+                } else {
+                    for(int i=0; i < 3; i++)
+                    {
+                        nickname[i] = list.get(i).getNickname();
+                        power[i] = list.get(i).getPower();
+                    }
+                }
+                
+            %>
+            <thead>
+                <tr>
+                    <th colspan="3">전투력 랭킹</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td rowspan="2" style="width: 75px"><img src="../asset/img/1st.jpg"></td>
+                    <td style="text-align:center"><%= nickname[0] %></td>
+                </tr>
+                <tr>
+                    
+                    <td style="text-align:left;"><%= power[0] %></td>
+                </tr>
+
+                <tr>
+                    <td rowspan="2" style="width: 75px"><img src="../asset/img/2nd.jpg"></td>
+                    <td style="text-align:center"><%= nickname[1] %></td>
+                </tr>
+                <tr>
+                    
+                    <td style="text-align:left;"><%= power[1] %></td>
+                </tr>
+
+                <tr>
+                    <td rowspan="2" style="width: 75px"><img src="../asset/img/3rd.jpg"></td>
+                    <td style="text-align:center"><%= nickname[2] %></td>
+                </tr>
+                <tr>
+                    
+                    <td style="text-align:left;"><%= power[2] %></td>
+                </tr>
+            </tbody>
+        </table>
+        <div id="settingitem">
+            <a href="../rank/setitem.jsp" ><img src="../asset/css/img/setitem.jpg"></a>
+            <div>△아이템 장착하러가기(레벨 3이상 클릭)△</div>
+        </div>
+    </section_m1>
+
+    <section_m2>
+        <table class="table table-bordered table-hover" style="background: #f3f3f3">
+            <%
+                ranklvDAO ranklvDao = new ranklvDAO();
+                ArrayList<ranklvDTO> lis = ranklvDao.getList();
+                String[] nicknam = new String[3];
+                int[] level = new int[3];
+                String[] date = new String[3];
+                if (lis.size() < 3){
+                    for(int i=0; i < lis.size(); i++)
+                    {
+                        nicknam[i] = lis.get(i).getNickname();
+                        level[i] = lis.get(i).getLV();
+                        date[i] = lis.get(i).getaccomDate();
+                    }
+                    for(int j=list.size(); j < 3; j++)
+                    {
+                        nicknam[j] = "없음";
+                        level[j] = 0;
+                        date[j] = "0000-00-00-000000000";
+                    }
+                } else {
+                    for(int i=0; i < 3; i++)
+                    {
+                        nicknam[i] = lis.get(i).getNickname();
+                        level[i] = lis.get(i).getLV();
+                        date[i] = lis.get(i).getaccomDate();
+                    }
+                }
+            %>
+            <thead>
+                <tr>
+                    <th colspan="3">레벨 랭킹</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td rowspan="2" style="width: 75px"><img src="../asset/img/1st.jpg"></td>
+                    <td colspan="2" style="text-align:center"><%= nicknam[0] %></td>
+                </tr>
+                <tr>
+                    <td style="width: 20%">LV: <%= level[0] %></td>
+                    <td style="text-align:left; font-size: 0.7em">달성일▽ <br><%= date[0].substring(0,11) + date[0].substring(11, 13) +"시" + date[0].substring(14,16) + "분 " + date[0].substring(17,19) + "초" %></td>
+                </tr>
+
+                <tr>
+                    <td rowspan="2" style="width: 75px"><img src="../asset/img/2nd.jpg"></td>
+                    <td colspan="2" style="text-align:center"><%= nicknam[1] %></td>
+                </tr>
+                <tr>
+                    <td style="width: 20%">LV: <%= level[1] %></td>
+                    <td style="text-align:left; font-size: 0.7em">달성일▽ <br><%= date[1].substring(0,11) + date[1].substring(11, 13) +"시" + date[1].substring(14,16) + "분 " + date[1].substring(17,19) + "초" %></td>
+                </tr>
+
+                <tr>
+                    <td rowspan="2" style="width: 75px"><img src="../asset/img/3rd.jpg"></td>
+                    <td colspan="2" style="text-align:center"><%= nicknam[2] %></td>
+                </tr>
+                <tr>
+                    <td style="width: 20%">LV: <%= level[2] %></td>
+                    <td style="text-align:left; font-size: 0.7em">달성일▽ <br><%= date[2].substring(0,11) + date[2].substring(11, 13) +"시" + date[2].substring(14,16) + "분 " + date[2].substring(17,19) + "초" %></td>
+                </tr>
+            </tbody>
+        </table>
+    </section_m2>
 </div>
 </body>
 </html>

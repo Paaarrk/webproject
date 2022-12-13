@@ -30,25 +30,24 @@
             PrintWriter script = response.getWriter();
             script.println("<script>");
             script.println("alert('접근 불가능한 아이템 입니다')");
-            script.println("location.href = '../inventory/trademarket.jsp'");
+            script.println("location.href = '../inventory/inventory.jsp'");
             script.println("</script>");
-        }
-
-        invDTO invDto = new invDAO().gettradeDTO(invid, 1);
-
-        if(invDto.getitemState() != 1) {
-            PrintWriter script = response.getWriter();
-            script.println("<script>");
-            script.println("alert('접근 불가능한 아이템 입니다')");
-            script.println("location.href = '../inventory/trademarket.jsp'");
-            script.println("</script>");
-        }
+        } 
+        invDTO invDto = new invDAO().getinvDTO(invid, id);
 
         if(invDto.getitemID() == 0) {
             PrintWriter script = response.getWriter();
             script.println("<script>");
             script.println("alert('접근 불가능한 아이템 입니다')");
-            script.println("location.href = '../inventory/trademarket.jsp'");
+            script.println("location.href = '../inventory/inventory.jsp'");
+            script.println("</script>");
+        }
+
+        if(invDto.getitemState() == 2) {
+            PrintWriter script = response.getWriter();
+            script.println("<script>");
+            script.println("alert('접근 불가능한 아이템 입니다')");
+            script.println("location.href = '../inventory/inventory.jsp'");
             script.println("</script>");
         }
         
@@ -101,10 +100,9 @@
         }
 
         //section함수
-        function goback() {
-            location.href = '../inventory/trademarket.jsp';
+        function goTrade() {
+            location.href = '../inventory/trade.jsp?invID=<%= invid %>'
         }
-        
 
 
     </script>
@@ -188,7 +186,7 @@
     <section4>
         <div style="background: #eeeeee; font-family: Hanna; height: 43px; text-align: center; border:#000 solid; font-size: 25px;">아이템 정보</div>
         <div style="background: #000000; height: 300px; color:antiquewhite">
-            <table style="border: 0px; width: 230px; height: 300px">
+            <table style="border: 0px; width: 200px; height: 300px">
                 <tr>
                     <td colspan = '1' style="width:75px; height: 75px"><div id="itemImage"><img src='<%= invDto.getitemUrl() %>'></div></td>
                     <td><div id="itemName">
@@ -238,29 +236,74 @@
     </section4>
 
     <section5>
-        <form name="tradeAction" method="post" action="../purchaseAction">
+        <form name="userWRITE" method="post" action="../forge">
             <table class="table table-striped" style="text-align: center; border: 3px solid #000000; width: 360px;">
                 <tbody>
                     
                     <tr>
-                        <td colspan="2">아이템 정보</td>
+                        <td colspan="5">아이템 강화성공시 스탯이 증가합니다!</td>
                     </tr>
                     <tr>
-                        <td style="width: 30%">판매가격</td><td><%= invDto.getitemPrice() %></td>
+                        <td colspan="2">이전 능력치</td><td> </td><td colspan="2">강화 성공시 능력치</td>
                     </tr>
-                    <tr>   
-                        <td colspan="2"><input class="btn btn-primary" style="float: left; font-family: 'Hanna';" type="button" value="뒤로가기" onclick="goback()">
-                        <% if(id.equals(invDto.getID())) { %>
-                            <div style="float: right; color:#000">나의 아이템입니다.</div>
-                        <% } else { %>
-                            <input class="btn btn-primary" style="float: right; font-family: 'Hanna';" type="submit" value="구매하기">
-                        <% } %>
-                        </td>
+                    <tr>
+                        <td style="width: 27%">강화수치</td>
+                        <td style="width: 20%"><%= invDto.getforgeLV() %>강</td>
+                        <td style="width: 6%">▶</td>
+                        <td style="width: 27%">강화수치</td>
+                        <td style="width: 20%"><%= invDto.getforgeLV() + 1 %>강</td>
                     </tr>
-                    
+                    <tr>
+                        <td style="width: 27%">공격력</td>
+                        <td style="width: 20%"><%= invDto.getitemAtt() %></td>
+                        <td style="width: 6%">▶</td>
+                        <td style="width: 27%">공격력</td>
+                        <td style="width: 20%"><%= invDto.getitemAtt() + 5*invDto.getitemRank() %></td>
+                    </tr>
+                    <tr>
+                        <td style="width: 27%">방어력</td>
+                        <td style="width: 20%"><%= invDto.getitemDef() %></td>
+                        <td style="width: 6%">▶</td>
+                        <td style="width: 27%">방어력</td>
+                        <td style="width: 20%"><%= invDto.getitemDef() + 5*invDto.getitemRank() %></td>
+                    </tr>
+                    <tr>
+                        <td style="width: 27%">회피율</td>
+                        <td style="width: 20%"><%= invDto.getitemAvd() %></td>
+                        <td style="width: 6%">▶</td>
+                        <td style="width: 27%">회피율</td>
+                        <td style="width: 20%"><%= invDto.getitemAvd() + 2*invDto.getitemRank() %></td>
+                    </tr>
+                    <tr>
+                        <td style="width: 27%">치명타확률</td>
+                        <td style="width: 20%"><%= invDto.getitemCrit() %></td>
+                        <td style="width: 6%">▶</td>
+                        <td style="width: 27%">치명타확률</td>
+                        <td style="width: 20%"><%= invDto.getitemCrit() + 1*invDto.getitemRank() %></td>
+                    </tr>
+                    <tr>
+                        <%
+                            int sucRate = 100 - invDto.getitemRank()*5 - invDto.getforgeLV()*3 - 25;
+                            if(sucRate < 5) {
+                                sucRate = 5;
+                            }
+                            if(invDto.getitemRank() == 5) {
+                                //GM장비
+                                sucRate = 100;
+                            }
+                        %>
+                        <td style="color: #fd1d1d" colspan="5">성공확률: <%= sucRate %>%, 실패시 파괴</td>
+                    </tr>
                 </tbody>
             </table>
-            <input type="hidden" name="invid" value="<%= invid %>">
+            <input class="btn btn-primary" style="float: left; font-family: 'Hanna';" type="button" value="거래소에 올리기" onclick="goTrade()">
+            <% if (invDto.getforgeLV() < 40) { %>
+            <input class="btn btn-primary" style="float: right; font-family: 'Hanna';" type="submit" value="강화하기(코인 -1000)">
+            <% } else { %>
+            <div style="color: red; float: right">더이상 강화 불가!</div>
+            <% } %>
+
+            <input type="hidden" name="invid" value="<%= invDto.getinvID() %>">
             <input type="hidden" name="id" value="<%= id %>">
         </form>
     </section5>

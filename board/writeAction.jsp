@@ -31,7 +31,7 @@
         } else {
             boardDAO boardDao = new boardDAO();
             int result = boardDao.write(board.getboardTitle(), id, board.getboardContent());
-            if (result == -1) {
+            if (result != 1) {
                 PrintWriter script = response.getWriter();
                 script.println("<script>");
                 script.println("alert('글쓰기에 실패했습니다.')");

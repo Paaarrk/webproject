@@ -3,7 +3,10 @@
 
 <%@ page import="board.boardDTO" %>
 <%@ page import="board.boardDAO" %>
+<%@ page import="java.util.ArrayList" %>
 <%@ page import="java.io.PrintWriter" %>
+<%@ page import="board.commentDTO" %>
+<%@ page import="board.commentDAO" %>
 
 
 <!DOCTYPE html>
@@ -13,7 +16,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/asset/css/bootstrap.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/asset/css/custom.css">
-    <title>글쓰기</title>
+    <title>놀이터</title>
     <script src="${pageContext.request.contextPath}/asset/js/jquery-3.6.1.min.js"></script>
     <script src="${pageContext.request.contextPath}/asset/js/bootstrap.js"></script>
     <%
@@ -33,6 +36,11 @@
             script.println("location.href = '../board/board.jsp'");
             script.println("</script>");
         } 
+        int pagenumber = 1;
+        if(request.getParameter("pageNumber") != null) {
+            pagenumber = Integer.parseInt(request.getParameter("pageNumber"));
+        }
+
         boardDTO boardDto = new boardDAO().getboardDTO(boardid);
     %>
     <script>
@@ -78,6 +86,12 @@
         function goinv() {
             location.href = '../inventory/inventory.jsp';
         }
+
+        function levelup() {
+            location.href = '../rank/levelup.jsp';
+        }
+
+        
         
     </script>
 </head>
@@ -141,6 +155,7 @@
                     </tr>
                 </tbody>
             </table>
+            <input class="btn btn-primary" style="float: left; font-family: 'Hanna';" type="button" value="레벨업" onclick="levelup()">
             <input class="btn btn-primary" style="float: right; font-family: 'Hanna';" type="button" value="로그아웃" onclick="logout()">
             <input class="btn btn-primary" style="float:right; font-family: 'Hanna'" type="button" value="인벤토리" onclick="goinv()">
         </div>
@@ -151,28 +166,71 @@
             <table class="table table-striped" style="text-align: center; border: 1px solid #dddddd">
                 <thead>
                     <tr>
-                        <th colspan="3" style="background-color: #6e6e6e; text-align: center;">게시글 보기</th>
+                        <th colspan="4" style="background-color: #6e6e6e; text-align: center;">게시글 보기</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
                         <td style="width: 20%;">게시글 제목</td>
-                        <td colspan="2"><%= boardDto.getboardTitle().replaceAll(" ", "&nbsp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\n", "<br>") %></td>
+                        <td colspan="3"><%= boardDto.getboardTitle().replaceAll(" ", "&nbsp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\n", "<br>") %></td>
                     </tr>
                     <tr>
                         <td>작성자</td>
-                        <td colspan="2"><%= boardDto.getNickname() %></td>
+                        <td colspan="3"><%= boardDto.getNickname() %></td>
                     </tr>
                     <tr>
                         <td>작성일자</td>
-                        <td colspan="2"><%= boardDto.getboardDate().substring(0,11) + boardDto.getboardDate().substring(11, 13) +"시" + boardDto.getboardDate().substring(14,16) + "분 " + boardDto.getboardDate().substring(17,19) + "초" %></td>
+                        <td colspan="3"><%= boardDto.getboardDate().substring(0,11) + boardDto.getboardDate().substring(11, 13) +"시" + boardDto.getboardDate().substring(14,16) + "분 " + boardDto.getboardDate().substring(17,19) + "초" %></td>
                     </tr>
                     <tr>
                         <td>내용</td>
-                        <td colspan="2" style="min-height: 200px; text-align: left;"><%= boardDto.getboardContent().replaceAll(" ", "&nbsp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\n", "<br>") %></td>
+                        <td colspan="3" style="min-height: 300px; text-align: left;"><%= boardDto.getboardContent().replaceAll(" ", "&nbsp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\n", "<br>") %></td>
                     </tr>
+                    <tr>
+                        <form name="commentWirte" method="post" action="../commentAction">
+                        <td><input type="submit" class="btn btn-primary" value="댓글 작성"></td>
+                        <td colspan="3">
+                            <textarea type="text" class="form-control" placeholder="글 내용" name="comment" maxlength="20" style="height: 80px"></textarea>
+                        </td>
+                        <input type="hidden" name="boardID" value="<%= boardDto.getboardID() %>">
+                        <input type="hidden" name="id" value="<%= id %>">
+                        </form>
+                    </tr>
+                    <tr>
+                        <td colspan="4">댓글</td>
+                    </tr>
+                    <%
+                        commentDAO commentDao = new commentDAO();
+                        ArrayList<commentDTO> list = commentDao.getList(pagenumber, boardid);
+                        for(int i = 0; i < list.size(); i++) {
+                    %>
+                    <tr>
+                        <td><%= list.get(i).getNickname() %></td>
+                        <td style="text-align: left"><%= list.get(i).getcomment().replaceAll(" ", "&nbsp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\n", "<br>") %></td>
+                        <td style="font-size: 10px; width: 25%"><%= list.get(i).getcommentDate().substring(0,11) + list.get(i).getcommentDate().substring(11, 13) +"시" + list.get(i).getcommentDate().substring(14,16) + "분 " + list.get(i).getcommentDate().substring(17,19) + "초" %></td>
+                        <td style="width: 12%">
+                            <% if (id.equals(list.get(i).getID())) { %>
+                            <a href = "../board/updatecom.jsp?commentID=<%= list.get(i).getcommentID() %> " class="btn btn-primary" style="width: 50px; height: 20px"><div style="font-size: 10px">수정</div></a>
+                            <a href = "../board/deletecom.jsp?commentID=<%= list.get(i).getcommentID() %> " class="btn btn-primary" style="width: 50px; height: 20px"><div style="font-size: 10px">삭제</div></a>
+                            <% } else {} %>
+                        </td>
+                    </tr>
+                    <%
+                        }
+                    %>
                 </tbody>
             </table>
+            <%
+                if(pagenumber !=1) {
+            %>
+                    <a style="width: 100px; float: right" href="../board/view.jsp?boardID=<%= boardid %>&&pageNumber=<%= pagenumber - 1 %>" class="btn btn-success btn-arrow-left">이전</a>
+            <%
+                } if(commentDao.nextPage(pagenumber + 1, boardid)) {
+            %>
+                    <a style="width: 100px; float: right" href="../board/view.jsp?boardID=<%= boardid %>&&pageNumber=<%= pagenumber + 1 %>" class="btn btn-success btn-arrow-right">다음</a>
+            <%
+                }
+            %>
             <a href="../board/board.jsp" class="btn btn-primary" style="width: 80px">목록</a>
             <%
                 if(id != null && id.equals(boardDto.getID())) {

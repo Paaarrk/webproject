@@ -4,6 +4,8 @@
 <%@ page import="java.io.PrintWriter" %>
 <%@ page import="inventory.invDAO" %>
 <%@ page import="inventory.invDTO" %>
+<%@ page import="user.userDAO" %>
+<%@ page import="user.userDTO" %>
 
 
 <!DOCTYPE html>
@@ -30,25 +32,36 @@
             PrintWriter script = response.getWriter();
             script.println("<script>");
             script.println("alert('접근 불가능한 아이템 입니다')");
-            script.println("location.href = '../inventory/trademarket.jsp'");
+            script.println("location.href = '../inventory/inventory.jsp'");
             script.println("</script>");
-        }
+        } 
+        invDAO invDao = new invDAO();
+        invDTO invDto = invDao.getinvDTO(invid, id);
 
-        invDTO invDto = new invDAO().gettradeDTO(invid, 1);
-
-        if(invDto.getitemState() != 1) {
+        if(invDto == null) {
             PrintWriter script = response.getWriter();
             script.println("<script>");
             script.println("alert('접근 불가능한 아이템 입니다')");
-            script.println("location.href = '../inventory/trademarket.jsp'");
+            script.println("location.href = '../inventory/inventory.jsp'");
             script.println("</script>");
         }
 
-        if(invDto.getitemID() == 0) {
+        if(invDto.getitemState() == 2 || invDto.getitemState() == 1) {
             PrintWriter script = response.getWriter();
             script.println("<script>");
             script.println("alert('접근 불가능한 아이템 입니다')");
-            script.println("location.href = '../inventory/trademarket.jsp'");
+            script.println("location.href = '../inventory/inventory.jsp'");
+            script.println("</script>");
+        }
+
+        int level = 0;
+        userDTO userDto = new userDAO().userinformation(id);
+        level = userDto.getlevel();
+        if(level < 3) {
+            PrintWriter script = response.getWriter();
+            script.println("<script>");
+            script.println("location.href = '../main/main.jsp'");
+            script.println("alert('레벨이 3보다 낮으시네요. 레벨을 더 올리고 오세요')");
             script.println("</script>");
         }
         
@@ -101,10 +114,9 @@
         }
 
         //section함수
-        function goback() {
-            location.href = '../inventory/trademarket.jsp';
+        function goTrade() {
+            location.href = '../rank/setitem.jsp'
         }
-        
 
 
     </script>
@@ -188,7 +200,7 @@
     <section4>
         <div style="background: #eeeeee; font-family: Hanna; height: 43px; text-align: center; border:#000 solid; font-size: 25px;">아이템 정보</div>
         <div style="background: #000000; height: 300px; color:antiquewhite">
-            <table style="border: 0px; width: 230px; height: 300px">
+            <table style="border: 0px; width: 200px; height: 300px">
                 <tr>
                     <td colspan = '1' style="width:75px; height: 75px"><div id="itemImage"><img src='<%= invDto.getitemUrl() %>'></div></td>
                     <td><div id="itemName">
@@ -238,29 +250,156 @@
     </section4>
 
     <section5>
-        <form name="tradeAction" method="post" action="../purchaseAction">
+        <form name="userWRITE" method="post" action="../equip">
             <table class="table table-striped" style="text-align: center; border: 3px solid #000000; width: 360px;">
-                <tbody>
+                <tbody style="font-size: 15px">
+                <%
+                
+                invDTO nowweapDto = invDao.getweapDTO(id);
+                invDTO nowaccDto = invDao.getaccDTO(id);
+                int nowweapAtt = 0; int nowweapDef = 0; int nowweapAvd = 0; int nowweapCrit = 0;
+                int nowaccAtt = 0; int nowaccDef = 0; int nowaccAvd = 0; int nowaccCrit = 0;
+                int HP = level*523+10000;
+                int nowweapPower = 0;
+                int nowaccPower = 0;
+                if(nowweapDto != null) {
+                    nowweapPower = nowweapDto.getitemAtt()*52 + nowweapDto.getitemDef()*33 + nowweapDto.getitemAvd()*527 + nowweapDto.getitemCrit()*728;
+                    nowweapAtt = nowweapDto.getitemAtt();
+                    nowweapDef = nowweapDto.getitemDef();
+                    nowweapAvd = nowweapDto.getitemAvd();
+                    nowweapCrit = nowweapDto.getitemCrit();
+                }
+                
+                if(nowaccDto != null) {
+                    nowaccPower = nowaccDto.getitemAtt()*52 + nowaccDto.getitemDef()*33 + nowaccDto.getitemAvd()*527 + nowaccDto.getitemCrit()*728; 
+                    nowaccAtt = nowaccDto.getitemAtt();
+                    nowaccDef = nowaccDto.getitemDef();
+                    nowaccAvd = nowaccDto.getitemAvd();
+                    nowaccCrit = nowaccDto.getitemCrit();
+                }
+
+
+                int nowPower = 3*HP+nowweapPower+nowaccPower;
+                int bfPower = nowPower;
+                int bfAtt = nowweapAtt + nowaccAtt;
+                int bfDef = nowweapDef + nowaccDef;
+                int bfAvd = nowweapAvd + nowaccAvd;
+                int bfCrit = nowweapCrit + nowaccCrit;
+
+                int afAtt = 0; int afDef = 0; int afAvd = 0; int afCrit = 0; int afPower = 0;
+                if(invDto.getitemID() < 200) {
+                    afAtt = nowaccAtt + invDto.getitemAtt();
+                    afDef = nowaccDef + invDto.getitemDef();
+                    afAvd = nowaccAvd + invDto.getitemAvd();
+                    afCrit = nowaccCrit + invDto.getitemCrit();
+                    afPower = 3*HP + afAtt*52 + afDef*33 + afAvd*527 + afCrit*728;
+                } else {
+                    afAtt = nowweapAtt + invDto.getitemAtt();
+                    afDef = nowweapDef + invDto.getitemDef();
+                    afAvd = nowweapAvd + invDto.getitemAvd();
+                    afCrit = nowweapCrit + invDto.getitemCrit();
+                    afPower = 3*HP + afAtt*52 + afDef*33 + afAvd*527 + afCrit*728;
+                }
+
+                
+                %>
                     
                     <tr>
-                        <td colspan="2">아이템 정보</td>
+                        <td colspan="6">아이템을 장착하면 전투력이 올라갑니다.</td>
                     </tr>
                     <tr>
-                        <td style="width: 30%">판매가격</td><td><%= invDto.getitemPrice() %></td>
+                        <td colspan="2">현재 전체 능력치</td><td> </td><td colspan="2">장착시 전체 능력치</td><td> </td>
                     </tr>
-                    <tr>   
-                        <td colspan="2"><input class="btn btn-primary" style="float: left; font-family: 'Hanna';" type="button" value="뒤로가기" onclick="goback()">
-                        <% if(id.equals(invDto.getID())) { %>
-                            <div style="float: right; color:#000">나의 아이템입니다.</div>
-                        <% } else { %>
-                            <input class="btn btn-primary" style="float: right; font-family: 'Hanna';" type="submit" value="구매하기">
-                        <% } %>
+                    <tr>
+                        <td style="width: 28%">전투력</td>
+                        <td style="width: 19%"><%= bfPower %></td>
+                        <td style="width: 3%">▶</td>
+                        <td style="width: 28%">전투력</td>
+                        <td style="width: 19%"><%= afPower %></td>
+                        <td style="width: 3%">
+                            <% if(bfPower>afPower) { %>
+                                <span style="color:#fd1d1d">▼</span>
+                            <% } else if(bfPower==afPower){ %>
+                                <span style="color:#000000">-</span>
+                            <% } else { %>
+                                <span style="color:#51fd1d">▲</span>
+                            <% } %>
                         </td>
                     </tr>
-                    
+                    <tr>
+                        <td style="width: 28%">공격력</td>
+                        <td style="width: 19%"><%= bfAtt %></td>
+                        <td style="width: 3%">▶</td>
+                        <td style="width: 28%">공격력</td>
+                        <td style="width: 19%"><%= afAtt %></td>
+                        <td style="width: 3%">
+                            <% if(bfAtt>afAtt) { %>
+                                <span style="color:#fd1d1d">▼</span>
+                            <% } else if(bfAtt==afAtt){ %>
+                                <span style="color:#000000">-</span>
+                            <% } else { %>
+                                <span style="color:#51fd1d">▲</span>
+                            <% } %>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 28%">방어력</td>
+                        <td style="width: 19%"><%= bfDef %></td>
+                        <td style="width: 3%">▶</td>
+                        <td style="width: 28%">방어력</td>
+                        <td style="width: 19%"><%= afDef %></td>
+                        <td style="width: 3%">
+                            <% if(bfDef>afDef) { %>
+                                <span style="color:#fd1d1d">▼</span>
+                            <% } else if(bfDef==afDef){ %>
+                                <span style="color:#000000">-</span>
+                            <% } else { %>
+                                <span style="color:#51fd1d">▲</span>
+                            <% } %>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 28%">회피율</td>
+                        <td style="width: 19%"><%= bfAvd %></td>
+                        <td style="width: 3%">▶</td>
+                        <td style="width: 28%">회피율</td>
+                        <td style="width: 19%"><%= afAvd %></td>
+                        <td style="width: 3%">
+                            <% if(bfAvd>afAvd) { %>
+                                <span style="color:#fd1d1d">▼</span>
+                            <% } else if(bfAvd==afAvd){ %>
+                                <span style="color:#000000">-</span>
+                            <% } else { %>
+                                <span style="color:#51fd1d">▲</span>
+                            <% } %>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 28%">치명타확률</td>
+                        <td style="width: 19%"><%= bfCrit %></td>
+                        <td style="width: 3%">▶</td>
+                        <td style="width: 28%">치명타확률</td>
+                        <td style="width: 19%"><%= afCrit %></td>
+                        <td style="width: 3%">
+                            <% if(bfCrit>afCrit) { %>
+                                <span style="color:#fd1d1d">▼</span>
+                            <% } else if(bfCrit==afCrit){ %>
+                                <span style="color:#000000">-</span>
+                            <% } else { %>
+                                <span style="color:#51fd1d">▲</span>
+                            <% } %>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="color: #fd1d1d" colspan="5">TIP: 전투력이 모든 척도가 되진않아요</td>
+                    </tr>
                 </tbody>
             </table>
-            <input type="hidden" name="invid" value="<%= invid %>">
+            <input class="btn btn-primary" style="float: left; font-family: 'Hanna';" type="button" value="뒤로가기" onclick="goTrade()">
+            <input class="btn btn-primary" style="float: right; font-family: 'Hanna';" type="submit" value="장착or해제하기">
+            
+
+            <input type="hidden" name="invid" value="<%= invDto.getinvID() %>">
             <input type="hidden" name="id" value="<%= id %>">
         </form>
     </section5>

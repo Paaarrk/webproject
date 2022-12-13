@@ -95,6 +95,10 @@
             location.href = '../inventory/inventory.jsp';
         }
 
+        function levelup() {
+            location.href = '../rank/levelup.jsp';
+        }
+
         //section함수
         function goinfo() {
             location.href = '../inventory/viewitem.jsp?invID=<%= invid %>'
@@ -170,6 +174,7 @@
                     </tr>
                 </tbody>
             </table>
+            <input class="btn btn-primary" style="float: left; font-family: 'Hanna';" type="button" value="레벨업" onclick="levelup()">
             <input class="btn btn-primary" style="float: right; font-family: 'Hanna';" type="button" value="로그아웃" onclick="logout()">
             <input class="btn btn-primary" style="float:right; font-family: 'Hanna'" type="button" value="인벤토리" onclick="goinv()">
         </div>

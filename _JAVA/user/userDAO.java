@@ -227,7 +227,7 @@ public class userDAO {
         return null;
     }
 
-    //글쓰면 코인 주기
+    //글쓰면 코인, 경험치 주기
     public int userWrite(String userId)
     {
         PreparedStatement pstmt = null;
@@ -239,6 +239,7 @@ public class userDAO {
             rs = pstmt.executeQuery();
             int result = 0;
             int coin = 0;
+            int exp = 0;
 
             if(rs.next()) {
                 // 정보 DTO 에 하나씩 저장
@@ -259,18 +260,31 @@ public class userDAO {
 
                 coin = User.getcoin();
                 coin = coin + 500;
-                User.setcoin(coin);
+                exp = User.getexp();
+                exp = exp + 500;
 
-                SQL = "UPDATE webproject.memberinfo SET Coin = ? WHERE (ID = ?)";
+                User.setcoin(coin);
+                User.setexp(exp);
+
+                SQL = "UPDATE webproject.memberinfo SET Coin = ?, exp = ? WHERE (ID = ?)";
                 try {
                     pstmt = conn.prepareStatement(SQL);
                     pstmt.setInt(1, coin);
-                    pstmt.setString(2, userId);
+                    pstmt.setInt(2, exp);
+                    pstmt.setString(3, userId);
                     result = pstmt.executeUpdate();
                 } catch (Exception e) {
-                    System.out.println("코인 수급실패");
+                    System.out.println("코인&경험치 수급실패");
                     result = 0;
                     e.printStackTrace();
+                } finally {
+                    try {
+                        if(rs != null) rs.close();
+                        if(pstmt != null) pstmt.close();
+                    } catch (Exception e) {
+                        System.out.println("정보업데이트 실패함");
+                        e.printStackTrace();
+                    }
                 }
 
                 return result;
@@ -339,7 +353,7 @@ public class userDAO {
                 System.out.println("정보업데이트 실패함");
                 e.printStackTrace();
             }
-        }
+        } 
 
         System.out.println("회원 정보 출력 실패");
         return -1;
@@ -378,7 +392,7 @@ public class userDAO {
 
                 coin = User.getcoin();
                 coin = coin + coinadd;
-                User.setcoin(coin);
+                
 
                 SQL = "UPDATE webproject.memberinfo SET Coin = ? WHERE (ID = ?)";
                 try {
@@ -390,6 +404,63 @@ public class userDAO {
                     System.out.println("코인 계산 실패");
                     result = -1;
                     e.printStackTrace();
+                } finally {
+                    try {
+                        if(rs != null) rs.close();
+                        if(pstmt != null) pstmt.close();
+                    } catch (Exception e) {
+                        System.out.println("정보업데이트 실패함");
+                        e.printStackTrace();
+                    }
+                }
+
+                return result;
+
+            } else {
+                System.out.println("존재하지 않는 아이디");
+                return -1;
+            }
+        } catch (Exception e) {
+            System.out.println("정보 업데이트 실패");
+            e.printStackTrace();
+        } finally {
+            try {
+                if(rs != null) rs.close();
+                if(pstmt != null) pstmt.close();
+            } catch (Exception e) {
+                System.out.println("정보업데이트 실패함");
+                e.printStackTrace();
+            }
+        }
+
+        System.out.println("회원 정보 출력 실패");
+        return -1;
+    }
+
+    //경험치 체크
+    public int enoughexp(String userId, int expneed)
+    {
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        String SQL = "SELECT * FROM webproject.memberinfo WHERE (ID = ?)";
+        try {
+            pstmt = conn.prepareStatement(SQL);
+            pstmt.setString(1, userId);
+            rs = pstmt.executeQuery();
+            int result = 0;
+            int exp = 0;
+
+            if(rs.next()) {
+                // 정보 DTO 에 하나씩 저장
+                userDTO User = new userDTO();
+                
+                User.setexp(rs.getInt(11));
+
+                exp = User.getexp();
+                if(exp<expneed) {
+                    result = 0;
+                } else {
+                    result = 1;
                 }
 
                 return result;
@@ -415,4 +486,135 @@ public class userDAO {
         return -1;
     }
     
+    // 경험치 증감
+    public int exp(String userId, int expadd)
+    {
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        String SQL = "SELECT * FROM webproject.memberinfo WHERE (ID = ?)";
+        try {
+            pstmt = conn.prepareStatement(SQL);
+            pstmt.setString(1, userId);
+            rs = pstmt.executeQuery();
+            int result = 0;
+            int exp = 0;
+
+            if(rs.next()) {
+                // 정보 DTO 에 하나씩 저장
+                userDTO User = new userDTO();
+                
+                User.setexp(rs.getInt(11));
+
+                exp = User.getexp();
+                exp = exp + expadd;
+                
+
+                SQL = "UPDATE webproject.memberinfo SET exp = ? WHERE (ID = ?)";
+                try {
+                    pstmt = conn.prepareStatement(SQL);
+                    pstmt.setInt(1, exp);
+                    pstmt.setString(2, userId);
+                    result = pstmt.executeUpdate();
+                } catch (Exception e) {
+                    System.out.println("경험치 계산 실패");
+                    result = -1;
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if(rs != null) rs.close();
+                        if(pstmt != null) pstmt.close();
+                    } catch (Exception e) {
+                        System.out.println("정보업데이트 실패함");
+                        e.printStackTrace();
+                    }
+                }
+
+                return result;
+
+            } else {
+                System.out.println("존재하지 않는 아이디");
+                return -1;
+            }
+        } catch (Exception e) {
+            System.out.println("정보 업데이트 실패");
+            e.printStackTrace();
+        } finally {
+            try {
+                if(rs != null) rs.close();
+                if(pstmt != null) pstmt.close();
+            } catch (Exception e) {
+                System.out.println("정보업데이트 실패함");
+                e.printStackTrace();
+            }
+        }
+
+        System.out.println("회원 정보 출력 실패");
+        return -1;
+    }
+
+    // 레벨업
+    public int levelup(String userId)
+    {
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        String SQL = "SELECT * FROM webproject.memberinfo WHERE (ID = ?)";
+        try {
+            pstmt = conn.prepareStatement(SQL);
+            pstmt.setString(1, userId);
+            rs = pstmt.executeQuery();
+            int result = 0;
+            int level = 0;
+
+            if(rs.next()) {
+                // 정보 DTO 에 하나씩 저장
+                userDTO User = new userDTO();
+                
+                User.setlevel(rs.getInt(10));
+
+                level = User.getlevel();
+                level = level + 1;
+                
+
+                SQL = "UPDATE webproject.memberinfo SET level = ? WHERE (ID = ?)";
+                try {
+                    pstmt = conn.prepareStatement(SQL);
+                    pstmt.setInt(1, level);
+                    pstmt.setString(2, userId);
+                    result = pstmt.executeUpdate();
+                } catch (Exception e) {
+                    System.out.println("레벨 계산 실패");
+                    result = -1;
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if(rs != null) rs.close();
+                        if(pstmt != null) pstmt.close();
+                    } catch (Exception e) {
+                        System.out.println("정보업데이트 실패함");
+                        e.printStackTrace();
+                    }
+                }
+
+                return result;
+
+            } else {
+                System.out.println("존재하지 않는 아이디");
+                return -1;
+            }
+        } catch (Exception e) {
+            System.out.println("정보 업데이트 실패");
+            e.printStackTrace();
+        } finally {
+            try {
+                if(rs != null) rs.close();
+                if(pstmt != null) pstmt.close();
+            } catch (Exception e) {
+                System.out.println("정보업데이트 실패함");
+                e.printStackTrace();
+            }
+        }
+
+        System.out.println("회원 정보 출력 실패");
+        return -1;
+    }
 }

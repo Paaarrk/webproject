@@ -3,7 +3,6 @@
 
 <%@ page import="java.io.PrintWriter" %>
 <%@ page import="java.util.ArrayList" %>
-<%@ page import="java.util.List"%>
 <%@ page import="inventory.invDAO" %>
 <%@ page import="inventory.invDTO" %>
 
@@ -23,7 +22,11 @@
         if (session.getAttribute("userID") != null) {
             id = (String) session.getAttribute("userID");
         }
-         
+
+        int pagenumber = 1;
+        if(request.getParameter("pageNumber") != null) {
+            pagenumber = Integer.parseInt(request.getParameter("pageNumber"));
+        }
     %>
     <script>
         
@@ -72,13 +75,9 @@
             location.href = '../rank/levelup.jsp';
         }
 
-        //section함수
+        //section 함수
         
-        
-
     </script>
-
-    
 
     <style type="text/css">
         a, a:hover {
@@ -154,65 +153,106 @@
     </aside>
 
     <section>
-                <%
-                invDAO invDao = new invDAO();
-                ArrayList<invDTO> list = invDao.getList(0, id);
-                %>
-        <div  style="width: 600px" class="inventory">
-            <div style="background-color: #6e6e6e; text-align: center">아이템 목록 (아이템 수: <%= list.size() %>)</div>
-            <div style="background-color: #6e6e6e; text-align: left; color: yellow">아이템 정보는 이미지 클릭!!</div>
-            <div style="background-color: #6e6e6e; text-align: right; color: yellow"><a href="../inventory/selling.jsp">판매중인 아이템 보러가기 </a></div>
-                <%  
-                
-                if( list.size() != 0 ) {
-                    for( int i = 0; i < list.size(); i++) {
+        <div class="row">
+            <table class="table table-striped" style="text-align: center; border: 1px solid #dddddd">
+                <thead>
+                    <tr>
+                        <th style="width: 75px; background-color: #6e6e6e; text-align: center">이미지</th>
+                        <th style="background-color: #6e6e6e; text-align: center; width: 150px">아이템 이름</th>
+                        <th style="background-color: #6e6e6e; text-align: center; width: 100px">아이템 분류</th>
+                        <th style="background-color: #6e6e6e; text-align: center; width: 150px">가격</th>
+                        <th style="background-color: #6e6e6e; text-align: center;">자세히 보기</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <%
+                        int surplus = 0;
+                        invDAO invDao = new invDAO();
+                        ArrayList<invDTO> list = invDao.mygettradeList(pagenumber, 1, id);
+                        if(list.size()>0) {
+                            for(int i = 0; i < list.size(); i++) {
+                            surplus = surplus + list.get(i).getitemPrice();
+                    %>
+                    <tr style="width: 75px">
+                        <td style="height: 75px;"><div style="width: 75px; height: 75px"><img src='<%= list.get(i).getitemUrl() %>'></div></td>
+                    
+                    
+                        
+                        <% switch(list.get(i).getitemRank()) {
+                            case 1:
+                        %>
+                            <td style="color: #4e71e4"><a href="#"></a><%= list.get(i).getitemName() %> (<%= list.get(i).getforgeLV() %>강)</a></td>
+                        <%  break;
+                            case 2:
+                        %>
+                            <td style="color: #ad4ee4"><a href="#"></a><%= list.get(i).getitemName() %> (<%= list.get(i).getforgeLV() %>강)</a></td>
+                        <%  break;
+                            case 3:
+                        %>
+                            <td style="color: #eef109; text-shadow:1px 1px 1px #000"><a href="#"></a><%= list.get(i).getitemName() %> (<%= list.get(i).getforgeLV() %>강)</a></td>
+                        <%  break;
+                            case 4:
+                        %>
+                            <td style="color: #4ee462"><a href="#"></a><%= list.get(i).getitemName() %> (<%= list.get(i).getforgeLV() %>강)</a></td>
+                        <%  break;
+                            case 5:
+                        %>
+                            <td style="color: #fd1d1d"><a href="#"></a><%= list.get(i).getitemName() %> (<%= list.get(i).getforgeLV() %>강)</a></td>
+                        <%  break;
+                            default:
+                        %>
+                            <td><a href="#"></a><%= list.get(i).getitemName() %> (<%= list.get(i).getforgeLV() %>강)</a></td>
+                        <%  break;
+                        }
+                        %>
+                        
+                        
+                        
+                        <% if(list.get(i).getitemID() < 200) {
+                        %>
+                        <td>무기</td>
+                        <%
+                        } else {
+                        %>
+                        <td>악세서리</td>
+                        <%
+                        }
+                        %>
+                        <td style="width: 150px; height: 95px; float: right"><%= list.get(i).getitemPrice() %> 코인</td>
+                        <td><a href="../inventory/viewmyTradeitem.jsp?invID=<%= list.get(i).getinvID() %>">☞ 판매취소</a></td>
+                    </tr>
+                    <%
+                        } } else {
+                    %>
+                            <tr>
+                                <td colspan="5" style="color: red">거래소에 올라온 아이템이 없어요..!</td>
+                            </tr>
+                    <%
+                        }
+                    %>
+                    <tr>
+                        <td colspan="3" style="text-align: right"><%= pagenumber %>페이지 예상흑자: <%= surplus %> </td>
+                        <td colspan="3" style="text-align: right">
+                            <%
+                                if(pagenumber !=1) {
+                            %>
+                                    <a style="width: 70px;" href="../inventory/selling.jsp?pageNumber=<%= pagenumber - 1 %>" class="btn btn-success btn-arrow-left">이전</a>
+                            <%
+                                } if(invDao.mynextPage(pagenumber + 1, 1, id)) {
+                            %>
+                                    <a style="width: 70px;" href="../inventory/selling.jsp?pageNumber=<%= pagenumber + 1 %>" class="btn btn-success btn-arrow-left">다음</a>
+                            <%
+                                }
+                            %>
+                        </td>
 
-                        if(list.get(i).getinvID() != 0) { %>
-                            <div class="pic" style="width: 75px; height: 75px; float: left; border: 1px #000000 solid"><a href="../inventory/viewitem.jsp?invID=<%= list.get(i).getinvID() %>"><img style="width:74px; height:74px" src='<%= list.get(i).getitemUrl() %>'><span class="forge" style="text-shadow: -1px 0 #000, 0 1px #000, 1px 0 #000, 0 -1px #000; color: yellow"><%= list.get(i).getforgeLV() %></span></a></div>
-                <%      } else { %>
-                            <div><img src='../asset/img/null.jpg'></div>
-                <%      } %>                
-                <%
-                    }} else {
-                %>
-                        <div style="color: red">획득한 아이템이 없네요! 아이템을 얻어주세요..!</div>
-                <%
-                    }
-                %>
-        </div>  
-        
-    </section>    
-        
-<!--
-    <section3>
-        <div style="background: #eeeeee; font-family: Hanna; height: 43px; text-align: center; border:#000 solid; font-size: 25px;">아이템 정보</div>
-        <div style="background: #000000; height: 260px; color:antiquewhite">
-            <table style="border: 0px; width: 200px; height: 270px">
-                <tr>
-                   <td colspan ="2" style="height: 30px">
-                        <div id="itemName"></div>
-                   </td> 
-                </tr>
-                <tr>
-                    <td colspan ="1" style="width: 80px; height: 30px; text-align:left">공격력</td>
-                    <td colspan ="1" style="width: 80px; height: 30px; text-align:left"><div id="itemAtt"></div></td>
-                </tr>
-                <tr>
-                    <td colspan ="1" style="width: 80px; height: 30px; text-align:left">방어력</td>
-                    <td colspan ="1" style="width: 80px; height: 30px; text-align:left"><div id="itemDef"></div></td>
-                </tr>
-                <tr>
-                    <td colspan ="1" style="width: 80px; height: 30px; text-align:leftr">회피율</td>
-                    <td colspan ="1" style="width: 100px; height: 30px; text-align:left"><div id="itemAvd"></div></td>
-                </tr>
-                <tr>
-                    <td colspan ="1" style="width: 80px; height: 30px; text-align:left">치명타확률</td>
-                    <td colspan ="1" style="width: 100px; height: 30px; text-align:left"><div id="itemCrit"></div></td>
-                </tr>
+                    </tr>
+                </tbody>
             </table>
+            
         </div>
-    </section3>
--->
+
+    </section>
     
 </div>
 </body>

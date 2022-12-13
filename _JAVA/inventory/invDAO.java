@@ -266,10 +266,7 @@ public class invDAO {
 
                 return invDto;
             } else {
-                invDTO invDto = new invDTO();
-                
-                invDto.setitemID(0);
-                return invDto;
+                return null;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -526,4 +523,239 @@ public class invDAO {
         
         return null; //해당 아이템이 존재하지않음
     }
+
+    //내가 올린 아이템목록
+    public ArrayList<invDTO> mygettradeList(int pageNumber, int itemState, String ID) {
+        String SQL = "SELECT invID, ID, webproject.inventory.itemID as itemID, webproject.inventory.itemName,  webproject.inventory.itemAtt,  webproject.inventory.itemDef,  webproject.inventory.itemAvd,  webproject.inventory.itemCrit, forgeLV, itemDate, itemState,  webproject.inventory.itemRank, webproject.item.itemUrl, itemPrice FROM webproject.inventory LEFT JOIN webproject.item ON webproject.inventory.itemID = webproject.item.itemID WHERE invID < ? AND itemState = ? AND ID = ? ORDER BY invID DESC LIMIT 10";
+        ArrayList<invDTO> list = new ArrayList<invDTO>();
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+        try {
+            pstmt = conn.prepareStatement(SQL);
+            pstmt.setInt(1, selectNum(pageNumber));
+            pstmt.setInt(2, itemState);
+            pstmt.setString(3, ID);
+            
+
+            rs = pstmt.executeQuery();
+            while (rs.next()) {
+                invDTO invDto = new invDTO();
+
+                invDto.setinvID(rs.getInt(1));
+                invDto.setID(rs.getString(2));
+                invDto.setitemID(rs.getInt(3));
+                invDto.setitemName(rs.getString(4));
+                invDto.setitemAtt(rs.getInt(5));
+                invDto.setitemDef(rs.getInt(6));
+                invDto.setitemAvd(rs.getInt(7));
+                invDto.setitemCrit(rs.getInt(8));
+                invDto.setforgeLV(rs.getInt(9));
+                invDto.setitemDate(rs.getString(10));
+                invDto.setitemState(rs.getInt(11));
+                invDto.setitemRank(rs.getInt(12));
+                invDto.setitemUrl(rs.getString(13));
+                invDto.setitemPrice(rs.getInt(14));
+
+                list.add(invDto);
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if(rs != null) rs.close();
+                if(pstmt != null) pstmt.close();
+            } catch (Exception e) {
+                System.out.println("정보업데이트 실패함");
+                e.printStackTrace();
+            }
+        }
+        
+        return list; 
+    }
+
+    // 나의 이전 페이지 마지막 invid숫자
+    public int myselectNum(int pageNumber, String ID) {
+        if(pageNumber == 1) {
+            invDAO invDao = new invDAO();
+            return invDao.getNext();
+        } else {
+            String SQL = "SELECT invID FROM (SELECT invID FROM webproject.inventory WHERE itemState=1 AND ID = ? ORDER BY invID DESC LIMIT ?) AS selection ORDER BY selection.invID ASC LIMIT 1";
+            ResultSet rs = null;
+            PreparedStatement pstmt = null;
+            try {
+                pstmt = conn.prepareStatement(SQL);
+                pstmt.setString(1, ID);
+                pstmt.setInt(2, (pageNumber-1) * 10);
+                rs = pstmt.executeQuery();
+                if (rs.next()) {
+                    return rs.getInt(1);
+                } else {
+                    return -1;
+                }
+    
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if(rs != null) rs.close();
+                    if(pstmt != null) pstmt.close();
+                } catch (Exception e) {
+                    System.out.println("정보업데이트 실패함");
+                    e.printStackTrace();
+                }
+            }
+            return -1;
+        }
+    }
+
+    //나의 페이징처리
+    public boolean mynextPage(int pageNumber, int itemState, String ID) {
+        String SQL = "SELECT * FROM webproject.inventory WHERE invID < ? AND itemState = ? AND ID = ? ORDER BY invID DESC LIMIT 10";
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+        try {
+            pstmt = conn.prepareStatement(SQL);
+            pstmt.setInt(1, myselectNum(pageNumber, ID));
+            pstmt.setInt(2, itemState);
+            pstmt.setString(3, ID);
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if(rs != null) rs.close();
+                if(pstmt != null) pstmt.close();
+            } catch (Exception e) {
+                System.out.println("정보업데이트 실패함");
+                e.printStackTrace();
+            }
+        }
+        
+        return false;
+    }
+//장착관련
+    // 아이템 장착 or 해제하기ㅣ
+    public int controlitem(String ID, int invID, int itemState) {
+        String SQL = "UPDATE webproject.inventory SET itemState = ? WHERE invID = ? AND ID = ?";
+        PreparedStatement pstmt = null;
+        try {
+            pstmt = conn.prepareStatement(SQL);
+            pstmt.setInt(1, itemState);
+            pstmt.setInt(2, invID);
+            pstmt.setString(3, ID);
+
+            return pstmt.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                
+                if(pstmt != null) pstmt.close();
+            } catch (Exception e) {
+                System.out.println("정보업데이트 실패함");
+                e.printStackTrace();
+            }
+        }
+        return -1; //데이터베이스 오류
+
+    }
+
+    // 장착한 무기아이템 DTO
+    public invDTO getweapDTO(String ID) {
+        String SQL = "SELECT invID, ID, webproject.inventory.itemID as itemID, webproject.inventory.itemName,  webproject.inventory.itemAtt,  webproject.inventory.itemDef,  webproject.inventory.itemAvd,  webproject.inventory.itemCrit, forgeLV, itemDate, itemState,  webproject.inventory.itemRank, webproject.item.itemUrl FROM webproject.inventory LEFT JOIN webproject.item ON webproject.inventory.itemID = webproject.item.itemID WHERE ID = ? AND itemState = 3 AND webproject.inventory.itemID < 200";
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+        try {
+            pstmt = conn.prepareStatement(SQL);
+            pstmt.setString(1, ID);
+            
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                invDTO weapDto = new invDTO();
+
+                weapDto.setinvID(rs.getInt(1));
+                weapDto.setID(rs.getString(2));
+                weapDto.setitemID(rs.getInt(3));
+                weapDto.setitemName(rs.getString(4));
+                weapDto.setitemAtt(rs.getInt(5));
+                weapDto.setitemDef(rs.getInt(6));
+                weapDto.setitemAvd(rs.getInt(7));
+                weapDto.setitemCrit(rs.getInt(8));
+                weapDto.setforgeLV(rs.getInt(9));
+                weapDto.setitemDate(rs.getString(10));
+                weapDto.setitemState(rs.getInt(11));
+                weapDto.setitemRank(rs.getInt(12));
+                weapDto.setitemUrl(rs.getString(13));
+
+                return weapDto;
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if(rs != null) rs.close();
+                if(pstmt != null) pstmt.close();
+            } catch (Exception e) {
+                System.out.println("정보업데이트 실패함");
+                e.printStackTrace();
+            }
+        }
+
+        return null;
+    }
+
+
+    // 장착한 악세서리아이템 DTO
+    public invDTO getaccDTO(String ID) {
+        String SQL = "SELECT invID, ID, webproject.inventory.itemID as itemID, webproject.inventory.itemName,  webproject.inventory.itemAtt,  webproject.inventory.itemDef,  webproject.inventory.itemAvd,  webproject.inventory.itemCrit, forgeLV, itemDate, itemState,  webproject.inventory.itemRank, webproject.item.itemUrl FROM webproject.inventory LEFT JOIN webproject.item ON webproject.inventory.itemID = webproject.item.itemID WHERE ID = ? AND itemState = 3 AND webproject.inventory.itemID > 200";
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+        try {
+            pstmt = conn.prepareStatement(SQL);
+            pstmt.setString(1, ID);
+            
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                invDTO accDto = new invDTO();
+
+                accDto.setinvID(rs.getInt(1));
+                accDto.setID(rs.getString(2));
+                accDto.setitemID(rs.getInt(3));
+                accDto.setitemName(rs.getString(4));
+                accDto.setitemAtt(rs.getInt(5));
+                accDto.setitemDef(rs.getInt(6));
+                accDto.setitemAvd(rs.getInt(7));
+                accDto.setitemCrit(rs.getInt(8));
+                accDto.setforgeLV(rs.getInt(9));
+                accDto.setitemDate(rs.getString(10));
+                accDto.setitemState(rs.getInt(11));
+                accDto.setitemRank(rs.getInt(12));
+                accDto.setitemUrl(rs.getString(13));
+
+                return accDto;
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if(rs != null) rs.close();
+                if(pstmt != null) pstmt.close();
+            } catch (Exception e) {
+                System.out.println("정보업데이트 실패함");
+                e.printStackTrace();
+            }
+        }
+
+        return null;
+    }
+
+    
 }

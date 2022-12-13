@@ -2,10 +2,45 @@
 <% request.setCharacterEncoding("UTF-8"); %>
 
 <%@ page import="java.io.PrintWriter" %>
-<%@ page import="java.util.ArrayList" %>
-<%@ page import="java.util.List"%>
-<%@ page import="inventory.invDAO" %>
-<%@ page import="inventory.invDTO" %>
+<%@ page import="board.commentDAO" %>
+<%@ page import="board.commentDTO" %>
+
+<%
+    String id = null;
+    if (session.getAttribute("userID") != null) {
+        id = (String) session.getAttribute("userID");
+    }
+
+        
+    if(id == null) {
+        PrintWriter script = response.getWriter();
+        script.println("<script>");
+        script.println("alert('로그아웃 되었습니다')");
+        script.println("location.href = '../main/login.jsp'");
+        script.println("</script>");
+    }
+
+    int commentid = 0;
+    if (request.getParameter("commentID") != null) {
+        commentid = Integer.parseInt(request.getParameter("commentID"));
+    }
+    if (commentid == 0) {
+        PrintWriter scri = response.getWriter();
+        scri.println("<script>");
+        scri.println("alert('유효하지 않은 댓글입니다.')");
+        scri.println("location.href = '../board/board.jsp'");
+        scri.println("</script>");
+    } 
+
+    commentDTO commentDto = new commentDAO().getcommentDTO(commentid);
+    if (!id.equals(commentDto.getID())) {
+        PrintWriter scrip = response.getWriter();
+        scrip.println("<script>");
+        scrip.println("alert('권한이 없습니다')");
+        scrip.println("location.href = '../board/board.jsp'");
+        scrip.println("</script>");
+    }
+%>
 
 
 <!DOCTYPE html>
@@ -18,16 +53,9 @@
     <title>놀이터</title>
     <script src="${pageContext.request.contextPath}/asset/js/jquery-3.6.1.min.js"></script>
     <script src="${pageContext.request.contextPath}/asset/js/bootstrap.js"></script>
-    <%
-        String id = null;
-        if (session.getAttribute("userID") != null) {
-            id = (String) session.getAttribute("userID");
-        }
-         
-    %>
-    <script>
-        
-        
+    
+
+    <script>  
         // 화면에 유저정보를 출력하기위해 데이터 받아오기
         window.onload = function loadinfo() {
             var memID = '<%= id%>';
@@ -59,6 +87,7 @@
                 })
             }
         } 
+
         
         function logout() {
             location.href = '../main/logout.jsp';
@@ -72,20 +101,17 @@
             location.href = '../rank/levelup.jsp';
         }
 
-        //section함수
-        
-        
+        // 제목 내용 비었나 확인
+        function checkValue() {
+            var form = document.usercomment;
 
-    </script>
-
-    
-
-    <style type="text/css">
-        a, a:hover {
-            color: #000000;
-            text-decoration: none;
+            if(!form.comment.value){
+                alert("내용을 입력하세요");
+                return false;
+            }
         }
-    </style>
+        
+    </script>
 </head>
 
 <body>
@@ -109,8 +135,8 @@
                 <li class="nav-item">
                     <a class="nav-link" href="../main/main.jsp">메인</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="../board/board.jsp">게시판</a>
+                <li class="nav-item active">
+                    <a class="nav-link" href="../board/board.jsp" style="color:#000">게시판</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="../inventory/trademarket.jsp">거래소</a>
@@ -154,65 +180,26 @@
     </aside>
 
     <section>
-                <%
-                invDAO invDao = new invDAO();
-                ArrayList<invDTO> list = invDao.getList(0, id);
-                %>
-        <div  style="width: 600px" class="inventory">
-            <div style="background-color: #6e6e6e; text-align: center">아이템 목록 (아이템 수: <%= list.size() %>)</div>
-            <div style="background-color: #6e6e6e; text-align: left; color: yellow">아이템 정보는 이미지 클릭!!</div>
-            <div style="background-color: #6e6e6e; text-align: right; color: yellow"><a href="../inventory/selling.jsp">판매중인 아이템 보러가기 </a></div>
-                <%  
-                
-                if( list.size() != 0 ) {
-                    for( int i = 0; i < list.size(); i++) {
-
-                        if(list.get(i).getinvID() != 0) { %>
-                            <div class="pic" style="width: 75px; height: 75px; float: left; border: 1px #000000 solid"><a href="../inventory/viewitem.jsp?invID=<%= list.get(i).getinvID() %>"><img style="width:74px; height:74px" src='<%= list.get(i).getitemUrl() %>'><span class="forge" style="text-shadow: -1px 0 #000, 0 1px #000, 1px 0 #000, 0 -1px #000; color: yellow"><%= list.get(i).getforgeLV() %></span></a></div>
-                <%      } else { %>
-                            <div><img src='../asset/img/null.jpg'></div>
-                <%      } %>                
-                <%
-                    }} else {
-                %>
-                        <div style="color: red">획득한 아이템이 없네요! 아이템을 얻어주세요..!</div>
-                <%
-                    }
-                %>
-        </div>  
-        
-    </section>    
-        
-<!--
-    <section3>
-        <div style="background: #eeeeee; font-family: Hanna; height: 43px; text-align: center; border:#000 solid; font-size: 25px;">아이템 정보</div>
-        <div style="background: #000000; height: 260px; color:antiquewhite">
-            <table style="border: 0px; width: 200px; height: 270px">
-                <tr>
-                   <td colspan ="2" style="height: 30px">
-                        <div id="itemName"></div>
-                   </td> 
-                </tr>
-                <tr>
-                    <td colspan ="1" style="width: 80px; height: 30px; text-align:left">공격력</td>
-                    <td colspan ="1" style="width: 80px; height: 30px; text-align:left"><div id="itemAtt"></div></td>
-                </tr>
-                <tr>
-                    <td colspan ="1" style="width: 80px; height: 30px; text-align:left">방어력</td>
-                    <td colspan ="1" style="width: 80px; height: 30px; text-align:left"><div id="itemDef"></div></td>
-                </tr>
-                <tr>
-                    <td colspan ="1" style="width: 80px; height: 30px; text-align:leftr">회피율</td>
-                    <td colspan ="1" style="width: 100px; height: 30px; text-align:left"><div id="itemAvd"></div></td>
-                </tr>
-                <tr>
-                    <td colspan ="1" style="width: 80px; height: 30px; text-align:left">치명타확률</td>
-                    <td colspan ="1" style="width: 100px; height: 30px; text-align:left"><div id="itemCrit"></div></td>
-                </tr>
+        <div class="row">
+        <form name="usercomment" method="post" action="../commentUpdate" onsubmit="return checkValue()">
+            <table class="table table-striped" style="text-align: center; border: 1px solid #dddddd">
+                <thead>
+                    <tr>
+                        <th colsapn="2" style="background-color: #6e6e6e; text-align: center;">댓글 수정</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><textarea type="text" class="form-control" placeholder="글 내용" name="comment" maxlength="256" style="height: 100px"><%= commentDto.getcomment() %></textarea></td>
+                    </tr>
+                </tbody>
             </table>
+            <input type="hidden" name="commentID" value="<%= commentid %>">
+            <input type="submit" class="btn btn-primary" value="수정하기" style="width: 100px;">
+        </form>
         </div>
-    </section3>
--->
+
+    </section>
     
 </div>
 </body>

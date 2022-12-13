@@ -6,6 +6,8 @@
 <%@ page import="java.util.List"%>
 <%@ page import="inventory.invDAO" %>
 <%@ page import="inventory.invDTO" %>
+<%@ page import="user.userDAO" %>
+<%@ page import="user.userDTO" %>
 
 
 <!DOCTYPE html>
@@ -24,6 +26,16 @@
             id = (String) session.getAttribute("userID");
         }
          
+        int level = 0;
+        userDTO userDto = new userDAO().userinformation(id);
+        level = userDto.getlevel();
+        if(level < 3) {
+            PrintWriter script = response.getWriter();
+            script.println("<script>");
+            script.println("location.href = '../main/main.jsp'");
+            script.println("alert('레벨이 3보다 낮으시네요. 레벨을 더 올리고 오세요')");
+            script.println("</script>");
+        }  
     %>
     <script>
         
@@ -156,26 +168,54 @@
     <section>
                 <%
                 invDAO invDao = new invDAO();
+                invDTO weapDto = invDao.getweapDTO(id);
+                invDTO accDto = invDao. getaccDTO(id);
+                
+                int HP = level*523+10000;
+                int weapPower = 0;
+                if(weapDto != null) {
+                    weapPower = weapDto.getitemAtt()*52 + weapDto.getitemDef()*33 + weapDto.getitemAvd()*527 + weapDto.getitemCrit()*728;
+                }
+                int accPower = 0;
+                if(accDto != null) {
+                    accPower = accDto.getitemAtt()*52 + accDto.getitemDef()*33 + accDto.getitemAvd()*527 + accDto.getitemCrit()*728; 
+                }
+
+                int Power = 3*HP+weapPower+accPower;
+                ArrayList<invDTO> eqlist = invDao.getList(3, id);
                 ArrayList<invDTO> list = invDao.getList(0, id);
                 %>
         <div  style="width: 600px" class="inventory">
-            <div style="background-color: #6e6e6e; text-align: center">아이템 목록 (아이템 수: <%= list.size() %>)</div>
-            <div style="background-color: #6e6e6e; text-align: left; color: yellow">아이템 정보는 이미지 클릭!!</div>
-            <div style="background-color: #6e6e6e; text-align: right; color: yellow"><a href="../inventory/selling.jsp">판매중인 아이템 보러가기 </a></div>
+            <div style="background-color: #6e6e6e; text-align: center">아이템 목록 (아이템 수: <%= list.size() + eqlist.size() %>)</div>
+            <div style="background-color: #6e6e6e; text-align: left; color: yellow">아이템 장착은 이미지를 누르세요</div>
+            <div style="background-color: #6e6e6e; text-align: left; color: #1ecceb">▽내가 장착한 아이템▽                  <span style="color: #57f80c">▶현재 나의 전투력: <%= Power %></span></div>
                 <%  
-                
-                if( list.size() != 0 ) {
-                    for( int i = 0; i < list.size(); i++) {
+                if( eqlist.size() != 0 ) {
+                    for( int i = 0; i < eqlist.size(); i++) {
 
-                        if(list.get(i).getinvID() != 0) { %>
-                            <div class="pic" style="width: 75px; height: 75px; float: left; border: 1px #000000 solid"><a href="../inventory/viewitem.jsp?invID=<%= list.get(i).getinvID() %>"><img style="width:74px; height:74px" src='<%= list.get(i).getitemUrl() %>'><span class="forge" style="text-shadow: -1px 0 #000, 0 1px #000, 1px 0 #000, 0 -1px #000; color: yellow"><%= list.get(i).getforgeLV() %></span></a></div>
+                        if(eqlist.get(i).getinvID() != 0) { %>
+                            <div class="pic" style="width: 75px; height: 75px; float: left; border: 1px #000000 solid"><a href="../inventory/equipitem.jsp?invID=<%= eqlist.get(i).getinvID() %>"><img style="width:74px; height:74px" src='<%= eqlist.get(i).getitemUrl() %>'><span class="forge" style="text-shadow: -1px 0 #000, 0 1px #000, 1px 0 #000, 0 -1px #000; color: #1ecceb; font-size: 12px;">전투력: <%= eqlist.get(i).getitemAtt()*52+eqlist.get(i).getitemDef()*33+eqlist.get(i).getitemAvd()*527+eqlist.get(i).getitemCrit()*728 %></span></a></div>
                 <%      } else { %>
                             <div><img src='../asset/img/null.jpg'></div>
                 <%      } %>                
                 <%
                     }} else {
                 %>
-                        <div style="color: red">획득한 아이템이 없네요! 아이템을 얻어주세요..!</div>
+                        <div style="color: red">아이템이 없어요... 아이템을 장착해주세요..!</div>
+                <%
+                    }
+                if( list.size() != 0 ) {
+                    for( int i = 0; i < list.size(); i++) {
+
+                        if(list.get(i).getinvID() != 0) { %>
+                            <div class="pic" style="width: 75px; height: 75px; float: left; border: 1px #000000 solid"><a href="../inventory/equipitem.jsp?invID=<%= list.get(i).getinvID() %>"><img style="width:74px; height:74px" src='<%= list.get(i).getitemUrl() %>'><span class="forge" style="text-shadow: -1px 0 #000, 0 1px #000, 1px 0 #000, 0 -1px #000; color: #4eeb1e; font-size: 12px;">전투력: <%= list.get(i).getitemAtt()*52+list.get(i).getitemDef()*33+list.get(i).getitemAvd()*527+list.get(i).getitemCrit()*728 %></span></a></div>
+                <%      } else { %>
+                            <div><img src='../asset/img/null.jpg'></div>
+                <%      } %>                
+                <%
+                    }} else {
+                %>
+                        <div style="color: red">아이템이 없어요... 아이템을 얻어주세요..!</div>
                 <%
                     }
                 %>
@@ -183,36 +223,7 @@
         
     </section>    
         
-<!--
-    <section3>
-        <div style="background: #eeeeee; font-family: Hanna; height: 43px; text-align: center; border:#000 solid; font-size: 25px;">아이템 정보</div>
-        <div style="background: #000000; height: 260px; color:antiquewhite">
-            <table style="border: 0px; width: 200px; height: 270px">
-                <tr>
-                   <td colspan ="2" style="height: 30px">
-                        <div id="itemName"></div>
-                   </td> 
-                </tr>
-                <tr>
-                    <td colspan ="1" style="width: 80px; height: 30px; text-align:left">공격력</td>
-                    <td colspan ="1" style="width: 80px; height: 30px; text-align:left"><div id="itemAtt"></div></td>
-                </tr>
-                <tr>
-                    <td colspan ="1" style="width: 80px; height: 30px; text-align:left">방어력</td>
-                    <td colspan ="1" style="width: 80px; height: 30px; text-align:left"><div id="itemDef"></div></td>
-                </tr>
-                <tr>
-                    <td colspan ="1" style="width: 80px; height: 30px; text-align:leftr">회피율</td>
-                    <td colspan ="1" style="width: 100px; height: 30px; text-align:left"><div id="itemAvd"></div></td>
-                </tr>
-                <tr>
-                    <td colspan ="1" style="width: 80px; height: 30px; text-align:left">치명타확률</td>
-                    <td colspan ="1" style="width: 100px; height: 30px; text-align:left"><div id="itemCrit"></div></td>
-                </tr>
-            </table>
-        </div>
-    </section3>
--->
+
     
 </div>
 </body>
